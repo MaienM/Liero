@@ -19,9 +19,12 @@ import com.lierojava.Constants;
 import com.lierojava.GlobalState;
 import com.lierojava.Utils;
 import com.lierojava.gameobjects.Ground;
+import com.lierojava.userdata.PendingAction;
 import com.lierojava.userdata.SimpleUserData;
+import com.lierojava.weapons.Grenade;
 import com.lierojava.weapons.Jetpack;
 import com.lierojava.weapons.Pistol;
+import com.lierojava.weapons.Shotgun;
 import com.lierojava.weapons.Weapon;
 
 public class Player extends Participant {
@@ -50,12 +53,12 @@ public class Player extends Participant {
 	/**
 	 * The weapons of the player.
 	 */
-	private ArrayList<Weapon> weapons = new ArrayList<>();
+	private ArrayList<Weapon> weapons;
 	
 	/**
 	 * The current weapon of the player.
 	 */
-	private Weapon currentWeapon;
+	public Weapon currentWeapon;
 	
 	/**
 	 * The aiming angle.
@@ -87,8 +90,26 @@ public class Player extends Participant {
 	 */
 	private int health = 100;
 	
+	/**
+	 * Whether to show the weapon in the hud.
+	 */
+	public boolean showWeapon = false;
+
+	/**
+	 * The show weapon countdown thread.
+	 */
+	public Thread showWeaponThread;
+	
 	public Player() {
-		this(new Vector2((new Random()).nextFloat() * 100, 0));
+		this(new Vector2(0, 0));
+		spawn();
+		
+		weapons = new ArrayList<>();
+		weapons.add(new Pistol(this));
+		weapons.add(new Shotgun(this));
+		weapons.add(new Grenade(this));
+
+		currentWeapon = weapons.get(0);
 	}
 	
 	/**
@@ -122,26 +143,6 @@ public class Player extends Participant {
 		
 		// Cleanup.
 		box.dispose();
-				
-		currentWeapon = new Pistol(this);
-		
-		//Remove any ground objects the player would collide with on spawn
-		//Perform microstep to calculate collisions of the newly created player
-		GlobalState.currentGame.world.step(1f/120f, 8, 3);
-		Array<Contact> contacts = Utils.getContacts(body);
-		for (Contact c : contacts) {
-			if (c.getFixtureA().getBody().getUserData() instanceof Ground) {
-				Body fa = c.getFixtureA().getBody();
-				Ground.groundObjects.remove(fa.getUserData());
-				fa.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
-			}
-			if (c.getFixtureB().getBody().getUserData() instanceof Ground) {
-				Body fb = c.getFixtureB().getBody();
-				Ground.groundObjects.remove(fb.getUserData());
-				fb.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
-			}
-			
-		}
 	}
 	
 	public static void setup() {
@@ -239,7 +240,7 @@ public class Player extends Participant {
 	 * Make the player jump.
 	 */
 	public void jump() {
-	boolean isTouchingGround = false;
+		boolean isTouchingGround = false;
 		for (Contact c : Utils.getContacts(body)) {
 			if (c.getFixtureA().getBody().getUserData() == SimpleUserData.FLOOR ||
 				c.getFixtureB().getBody().getUserData() == SimpleUserData.FLOOR) {
@@ -287,6 +288,22 @@ public class Player extends Participant {
 	 */
 	public void setWeaponIndex(int index) {
 		currentWeapon = weapons.get(index);
+		showWeapon = true;
+		if (showWeaponThread != null) {
+			showWeaponThread.interrupt();
+		}
+		showWeaponThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					return;
+				}
+				showWeapon = false;
+			}
+		});
+		showWeaponThread.start();
 	}
 	
 	/**
@@ -304,6 +321,9 @@ public class Player extends Participant {
 	 * @param amount The amount of damage to deal.
 	 */
 	public void doDamage(int amount) {
+		if (health <= 0) {
+			return;
+		}
 		health -= amount;
 		if (health <= 0) {
 			die();
@@ -314,7 +334,41 @@ public class Player extends Participant {
 	 * TODO: Implement.
 	 */
 	private void die() {
-		health = 100;
+		spawn();
+	}
+	
+	private void spawn() {
+		final Object oldUserData = body.getUserData();
+		body.setUserData(new PendingAction() {
+			@Override
+			public void run(Body body) {
+				health = 100;
+				
+				Random r = new Random();
+				body.setTransform(new Vector2(r.nextFloat() * Gdx.graphics.getWidth() - Gdx.graphics.getWidth() / 2, 
+											  r.nextFloat() * Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 2), 
+								  0); 
+				
+				//Remove any ground objects the player would collide with on spawn
+				//Perform microstep to calculate collisions of the newly created player
+				GlobalState.currentGame.world.step(1f/120f, 8, 3);
+				Array<Contact> contacts = Utils.getContacts(body);
+				for (Contact c : contacts) {
+					if (c.getFixtureA().getBody().getUserData() instanceof Ground) {
+						Body fa = c.getFixtureA().getBody();
+						Ground.groundObjects.remove(fa.getUserData());
+						fa.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+					}
+					if (c.getFixtureB().getBody().getUserData() instanceof Ground) {
+						Body fb = c.getFixtureB().getBody();
+						Ground.groundObjects.remove(fb.getUserData());
+						fb.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+					}
+				}				
+				
+				body.setUserData(oldUserData);
+			}
+		});
 	}
 
 	/**

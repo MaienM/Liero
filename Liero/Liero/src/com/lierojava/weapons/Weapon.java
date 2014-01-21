@@ -1,17 +1,14 @@
 package com.lierojava.weapons;
 
-import java.io.Serializable;
-
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
 import com.lierojava.Constants;
 import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.participants.Player;
 
-public abstract class Weapon implements Serializable {
+public abstract class Weapon {
 	/**
 	 * The player to which this weapon belongs.
 	 */
@@ -58,6 +55,11 @@ public abstract class Weapon implements Serializable {
 	protected Class<?> bulletClass;
 	
 	/**
+	 * The icon for this weapon.
+	 */
+	public Texture icon;
+	
+	/**
 	 * Setup a new weapon.
 	 * 
 	 * @param p The player to which this weapon belongs.
@@ -67,12 +69,20 @@ public abstract class Weapon implements Serializable {
 		currentCharge = maxCharge;
 		
 		// Start the regeneration timer.
-		Timer.schedule(new Task() {
+		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				currentCharge = Math.min(maxCharge, currentCharge + 1);
+				while (true) {
+					currentCharge = Math.min(maxCharge, currentCharge + 1);
+					try {
+						Thread.sleep((int)(regenSpeed * 1000));
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
-		}, 0, regenSpeed);
+		}).start();
 	}
 	
 	/**

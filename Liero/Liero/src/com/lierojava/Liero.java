@@ -212,13 +212,9 @@ public class Liero extends Game implements ApplicationListener {
 			//RemoteObject ro = (RemoteObject)game.iph;
 			//ro.setNonBlocking(true);
 			
-			Utils.print(21);
 			IHostParticipant ihp = new HostParticipant();
-			Utils.print(22);
 			GlobalState.objectSpace.register(++GlobalState.objectSpaceIndex, ihp);
-			Utils.print(23);
 			game.iph.register(GlobalState.objectSpaceIndex);
-			Utils.print(24);
 			
 			//ro.setNonBlocking(false);
 		}

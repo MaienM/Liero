@@ -2,7 +2,6 @@ package com.lierojava.net.handles;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.lierojava.GlobalState;
-import com.lierojava.Utils;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
 
@@ -25,7 +24,6 @@ public class ParticipantHost implements IParticipantHost {
 	
 	public ParticipantHost() {}
 	public ParticipantHost(Player player) {
-		Utils.print(GlobalState.currentGame.players.size());
 		this.index = GlobalState.currentGame.players.indexOf(player);
 	}
 
@@ -71,7 +69,7 @@ public class ParticipantHost implements IParticipantHost {
 
 	@Override
 	public void setWeaponIndex(int index) {
-		GlobalState.currentGame.players.get(index).setWeaponIndex(index);
+		GlobalState.currentGame.players.get(this.index).setWeaponIndex(index);
 	}
 
 	@Override
@@ -87,10 +85,7 @@ public class ParticipantHost implements IParticipantHost {
 	
 	@Override
 	public void register(int index) {
-		Utils.print(31);
 		//IHostParticipant ihp = ObjectSpace.getRemoteObject(connection, index, IHostParticipant.class);
-		Utils.print(32);
 		//GlobalState.currentGame.ihps.add(ihp);
-		Utils.print(33);
 	}
 }

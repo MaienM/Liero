@@ -2,26 +2,14 @@ package com.lierojava.gui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.lierojava.Constants;
 import com.lierojava.GlobalState;
-import com.lierojava.MainGame;
 import com.lierojava.Utils;
 import com.lierojava.participants.Player;
 
 public class HUD {
-	/**
-	 * The game to which this HUD belongs.
-	 */
-	private MainGame game;
-	
-	/**
-	 * The font for drawing text on the screen. 
-	 */
-	private static BitmapFont font = new BitmapFont();
-
 	/**
 	 * The crosshair texture.
 	 */
@@ -37,8 +25,7 @@ public class HUD {
 	 */
 	private static Texture healthTexture = new Texture(Gdx.files.internal("textures/healthBar.png"));
 	
-	public HUD(MainGame game) {
-		this.game = game;
+	public HUD() {
 	}
 	
 	public void render(SpriteBatch batch) {
@@ -51,13 +38,18 @@ public class HUD {
 			size.scl(Constants.CROSSHAIR_SCALE);
 			batch.draw(crosshairTexture, playerPosition.x + aimOffset.x - size.x / 2, playerPosition.y + aimOffset.y - size.y / 2, size.x, size.y);
 			
-			// TODO: Render the weapon icons.
 			// TODO: Render the weapon data (reload, charge, etc).
 			// TODO: Render the game data (time, etc).
 			
 			// Health bar.
 			batch.draw(healthBorderTexture, playerPosition.x - healthBorderTexture.getWidth() / 2, playerPosition.y + healthBorderTexture.getHeight() + 10, healthBorderTexture.getWidth(), healthBorderTexture.getHeight());
 			batch.draw(healthTexture, playerPosition.x - healthTexture.getWidth() / 2, playerPosition.y + healthTexture.getHeight() + 10, healthTexture.getWidth() * player.getHealth() / 100f, healthTexture.getHeight());
+			
+			// Weapon icon.
+			if (player.showWeapon) {
+				Texture t = player.currentWeapon.icon; 
+				batch.draw(t, playerPosition.x - t.getWidth() / 2, playerPosition.y + 20, t.getWidth(), t.getHeight());
+			}
 		}
 	}
 }

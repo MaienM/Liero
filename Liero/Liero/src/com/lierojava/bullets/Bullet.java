@@ -1,5 +1,8 @@
 package com.lierojava.bullets;
 
+import java.lang.ref.WeakReference;
+
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -13,35 +16,54 @@ public abstract class Bullet {
 	/**
 	 * The body of this bullet.
 	 */
-	private Body body;
+	protected Body body;
 	
 	/**
 	 * The size of the bullet.
 	 */
-	protected Vector2 bulletSize;
+	protected Vector2 size;
 	
 	/**
 	 * The speed of the bullet.
 	 */
-	protected float bulletSpeed;
+	protected float speed;
+	
+	/**
+	 * The texture of the bullet.
+	 */
+	protected Texture texture;
+	
+	/**
+	 * The damage the bullet does.
+	 */
+	public int damage;
 
 	/**
-	 * Setup the bullet.
+	 * @see spawnBullet.
+	 */
+	public void setup(Vector2 start, float angle) {
+		spawnBullet(start, angle);
+	}
+	
+	/**
+	 * Spawn a bullet.
 	 * 
 	 * @param start The start position of the bullet.
 	 * @param angle The angle at which the bullet is fired.
 	 */
-	public void setup(Vector2 start, float angle) {		
+	protected void spawnBullet(Vector2 start, float angle) {
 		// Create the body.
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(start);
 		bodyDef.bullet = true;
 		body = GlobalState.currentGame.world.createBody(bodyDef);
+		body.setUserData(this);
+		GlobalState.bullets.put(new WeakReference<Body>(body), texture);
 
 		// Create the bullet shape.
 		PolygonShape box = new PolygonShape();
-		box.setAsBox(bulletSize.x, bulletSize.y);
+		box.setAsBox(size.x, size.y);
 		
 		// Create the fixture.
 		FixtureDef fixture = new FixtureDef();
@@ -52,6 +74,6 @@ public abstract class Bullet {
 		body.createFixture(fixture);
 		
 		// Apply force.
-		body.applyForceToCenter(Utils.angleToVector(angle).scl(10000 * bulletSpeed), true);
+		body.applyForceToCenter(Utils.angleToVector(angle).scl(10000 * speed), true);
 	}
 }

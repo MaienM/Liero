@@ -1,6 +1,8 @@
 package com.lierojava;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -19,12 +21,14 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.lierojava.bullets.Bullet;
 import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.HUD;
 import com.lierojava.net.interfaces.IHostParticipant;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
+import com.lierojava.userdata.PendingAction;
 import com.lierojava.userdata.SimpleUserData;
 
 public class MainGame implements Screen {
@@ -51,12 +55,7 @@ public class MainGame implements Screen {
 	/**
 	 * The HUD.
 	 */
-	private HUD hud = new HUD(this);
-	
-	/**
-	 * The player belonging to this instance.
-	 */
-	public Player currentPlayer;
+	private HUD hud = new HUD();
 	
 	/**
 	 * The players.
@@ -131,6 +130,16 @@ public class MainGame implements Screen {
 		for (Player p : players) {
 			p.render(batch);
 		}
+		
+		// Render the bullets.
+		for (Entry<WeakReference<Body>, Texture> entry : GlobalState.bullets.entrySet()) {
+			Body body = entry.getKey().get();
+			if (body != null && body.getUserData() != SimpleUserData.MARKED_FOR_REMOVAL) {
+				Vector2 position = body.getPosition();
+				Texture texture = entry.getValue();
+				batch.draw(texture, position.x, position.y, texture.getWidth(), texture.getHeight()); 
+			}
+		}
 
 		// Render the HUD.
 		hud.render(batch);
@@ -196,7 +205,7 @@ public class MainGame implements Screen {
 			iph.setWeaponIndex((iph.getWeaponIndex() + 1) % Constants.MAX_WEAPONS);
 		}
 		if (Gdx.input.isKeyPressed(Keys.PAGE_DOWN)) {
-			iph.setWeaponIndex((iph.getWeaponIndex() - 1) % Constants.MAX_WEAPONS);
+			iph.setWeaponIndex((Constants.MAX_WEAPONS + iph.getWeaponIndex() - 1) % Constants.MAX_WEAPONS);
 		}
 		if (Gdx.input.isKeyPressed(Keys.NUM_1)) {
 			iph.setWeaponIndex(0);
@@ -292,22 +301,29 @@ public class MainGame implements Screen {
 			return;
 		}
 		
+		// If either body is marked for removal, do nothing.
+		if (bodyA.getUserData() == SimpleUserData.MARKED_FOR_REMOVAL || bodyB.getUserData() == SimpleUserData.MARKED_FOR_REMOVAL) {
+			return;
+		}
+		
 		// If the collision is with a player, deal damage.
 		for (Player p : players) {
 			if (bodyA.equals(p.getBody())) {
-				p.doDamage(50);
+				p.doDamage(((Bullet)bodyB.getUserData()).damage);
 			}
 			if (bodyB.equals(p.getBody())) {
-				p.doDamage(50);
+				p.doDamage(((Bullet)bodyA.getUserData()).damage);
 			}
 		}
 		
 		// Remove the bullets.
-		if (bodyA.isBullet()) {
-			bodyA.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
-		}
-		if (bodyB.isBullet()) {
-			bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+		if (bodyA.getUserData() != bodyB.getUserData()) {
+			if (bodyA.isBullet()) {
+				bodyA.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+			}
+			if (bodyB.isBullet()) {
+				bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+			}
 		}
 		
 		if (bodyA.getUserData() instanceof Ground) {
@@ -340,6 +356,9 @@ public class MainGame implements Screen {
 			}
 			if (b.getUserData() == SimpleUserData.MARKED_FOR_REMOVAL) {
 				world.destroyBody(b);
+			}
+			else if (b.getUserData() instanceof PendingAction) {
+				((PendingAction)b.getUserData()).run(b);
 			}
 		}
 	}	
