@@ -134,7 +134,7 @@ public class MainGame implements Screen {
 		// Render the bullets.
 		for (Entry<WeakReference<Body>, Texture> entry : GlobalState.bullets.entrySet()) {
 			Body body = entry.getKey().get();
-			if (body != null && body.getUserData() != SimpleUserData.MARKED_FOR_REMOVAL) {
+			if (body != null && body.getUserData() != SimpleUserData.MARKED_FOR_REMOVAL && body.getUserData() != null) {
 				Vector2 position = body.getPosition();
 				Texture texture = entry.getValue();
 				batch.draw(texture, position.x, position.y, texture.getWidth(), texture.getHeight()); 
