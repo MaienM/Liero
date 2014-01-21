@@ -137,7 +137,7 @@ public class MainGame implements Screen {
 			if (body != null && body.getUserData() != SimpleUserData.MARKED_FOR_REMOVAL && body.getUserData() != null) {
 				Vector2 position = body.getPosition();
 				Texture texture = entry.getValue();
-				batch.draw(texture, position.x, position.y, texture.getWidth(), texture.getHeight()); 
+				batch.draw(texture, position.x - (texture.getWidth() / 2), position.y - (texture.getHeight() / 2), texture.getWidth(), texture.getHeight()); 
 			}
 		}
 
@@ -148,7 +148,7 @@ public class MainGame implements Screen {
 		batch.end();	
 
 		// Draw the debug view.
-		debugRenderer.render(world, camera.combined);
+		//debugRenderer.render(world, camera.combined);
 		
 		// Perform a game step.
 		if (isHost) {

@@ -69,7 +69,7 @@ public abstract class Bullet {
 		FixtureDef fixture = new FixtureDef();
 		fixture.shape = box;
 		fixture.density = 1.0f;
-		fixture.friction = 0.0f;
+		fixture.friction = 3.0f;
 		fixture.restitution = 0.2f;
 		body.createFixture(fixture);
 		
