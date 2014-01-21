@@ -40,7 +40,7 @@ public class Utils {
 	 * @return A list of all the contacts for this body.
 	 */
 	public static Array<Contact> getContacts(Body b) {
-		Array<Contact> contacts = new Array<>();
+		Array<Contact> contacts = new Array<Contact>();
 		for (Contact c : GlobalState.currentGame.world.getContactList()) {
 			if (c.getFixtureA().getBody() == b || c.getFixtureB().getBody() == b) {
 				contacts.add(c);

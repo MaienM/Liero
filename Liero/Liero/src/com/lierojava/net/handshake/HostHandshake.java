@@ -18,7 +18,7 @@ public class HostHandshake implements IHostHandshake {
 			Player p = new Player();
 			GlobalState.currentGame.players.add(p);
 			ParticipantHost ph = new ParticipantHost(p);
-			ph.connection = GlobalState.lastSender;
+			//ph.connection = GlobalState.lastSender;
 			GlobalState.objectSpace.register(++GlobalState.objectSpaceIndex, ph);
 			return GlobalState.objectSpaceIndex;
 		}

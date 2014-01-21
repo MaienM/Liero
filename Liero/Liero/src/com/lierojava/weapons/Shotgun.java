@@ -11,7 +11,7 @@ public class Shotgun extends Weapon {
 		regenSpeed = 2f;
 		knockbackForce = 3f;
 		fireRate = 0.1f;
-		fireSound = Gdx.audio.newSound(Gdx.files.internal("sounds/gun.mp3"));
+		fireSound = Gdx.audio.newSound(Gdx.files.internal("sounds/shotgun.mp3"));
 		bulletClass = ShotgunBullet.class;
 		icon = new Texture(Gdx.files.internal("textures/icon_shotgun.png"));
 	}

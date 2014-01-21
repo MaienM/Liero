@@ -1,6 +1,5 @@
 package com.lierojava.net.handles;
 
-import com.esotericsoftware.kryonet.Connection;
 import com.lierojava.GlobalState;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
@@ -20,7 +19,7 @@ public class ParticipantHost implements IParticipantHost {
 	/**
 	 * The connection to this participant.
 	 */
-	public Connection connection;
+	//public Connection connection;
 	
 	public ParticipantHost() {}
 	public ParticipantHost(Player player) {

@@ -28,7 +28,7 @@ public class Ground {
 	/**
 	 * The groundObjects that still exist
 	 */
-	public static ArrayList<Ground> groundObjects = new ArrayList<>();
+	public static ArrayList<Ground> groundObjects = new ArrayList<Ground>();
 	
 	/**
 	 * Fills the world with groundObject bodies

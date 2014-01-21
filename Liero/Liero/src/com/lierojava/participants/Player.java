@@ -104,7 +104,7 @@ public class Player extends Participant {
 		this(new Vector2(0, 0));
 		spawn();
 		
-		weapons = new ArrayList<>();
+		weapons = new ArrayList<Weapon>();
 		weapons.add(new Pistol(this));
 		weapons.add(new Shotgun(this));
 		weapons.add(new Grenade(this));
@@ -345,8 +345,8 @@ public class Player extends Participant {
 				health = 100;
 				
 				Random r = new Random();
-				body.setTransform(new Vector2(r.nextFloat() * Gdx.graphics.getWidth() - Gdx.graphics.getWidth() / 2, 
-											  r.nextFloat() * Gdx.graphics.getHeight() - Gdx.graphics.getHeight() / 2), 
+				body.setTransform(new Vector2(r.nextFloat() * Gdx.graphics.getWidth() * 0.8f - Gdx.graphics.getWidth() * 0.4f, 
+											  r.nextFloat() * Gdx.graphics.getHeight() * 0.8f - Gdx.graphics.getHeight() * 0.4f), 
 								  0); 
 				
 				//Remove any ground objects the player would collide with on spawn

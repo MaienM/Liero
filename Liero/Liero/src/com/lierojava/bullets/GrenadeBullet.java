@@ -31,6 +31,7 @@ public class GrenadeBullet extends Bullet {
 				}
 				Vector2 start = body.getPosition();
 				body.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+				Gdx.audio.newSound(Gdx.files.internal("sounds/grenadeExplosion.mp3")).play();
 				size = new Vector2(0.5f, 0.5f);
 				speed = 0.2f;
 				float PI = (float)Math.PI;

@@ -136,12 +136,27 @@ public class Liero extends Game implements ApplicationListener {
 		Contact.class,
 		ContactListener.class,
 		Screen.class,
+		
+		java.lang.RuntimeException.class,
+		java.lang.StackTraceElement[].class,
+		java.lang.StackTraceElement.class,
 	};
 	
 	/**
 	 * The maingame.
 	 */
 	private MainGame game;
+	
+	/**
+	 * The host, if any.
+	 */
+	private String host;
+	
+	public Liero() {
+	}
+	public Liero(String host) {
+		this.host = host;
+	}
 	
 	@Override
 	public void create() {
@@ -153,10 +168,15 @@ public class Liero extends Game implements ApplicationListener {
 		
 		Player.setup();
 				
-		try {
-			startServer();
+		if (host == null) {
+			try {
+				startServer();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} 
-		catch (IOException e) {
+		else {
 			startClient();
 		}
 	}
@@ -199,7 +219,7 @@ public class Liero extends Game implements ApplicationListener {
 		setupKryo(client.getKryo());
 		client.start();
 		try {
-			client.connect(5000, "127.0.0.1", Constants.PORT, Constants.PORT);
+			client.connect(5000, host, Constants.PORT, Constants.PORT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -212,9 +232,9 @@ public class Liero extends Game implements ApplicationListener {
 			//RemoteObject ro = (RemoteObject)game.iph;
 			//ro.setNonBlocking(true);
 			
-			IHostParticipant ihp = new HostParticipant();
-			GlobalState.objectSpace.register(++GlobalState.objectSpaceIndex, ihp);
-			game.iph.register(GlobalState.objectSpaceIndex);
+			//IHostParticipant ihp = new HostParticipant();
+			//GlobalState.objectSpace.register(++GlobalState.objectSpaceIndex, ihp);
+			//game.iph.register(GlobalState.objectSpaceIndex);
 			
 			//ro.setNonBlocking(false);
 		}

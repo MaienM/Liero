@@ -60,7 +60,7 @@ public class MainGame implements Screen {
 	/**
 	 * The players.
 	 */
-	public ArrayList<Player> players = new ArrayList<>();
+	public ArrayList<Player> players = new ArrayList<Player>();
 	
 	/**
 	 * Whether this instance is hosting the game.
@@ -85,7 +85,7 @@ public class MainGame implements Screen {
 	/**
 	 * The IHostParticipant objects, for communications from the host.
 	 */
-	public ArrayList<IHostParticipant> ihps = new ArrayList<>();
+	public ArrayList<IHostParticipant> ihps = new ArrayList<IHostParticipant>();
 	
 	/**
 	 * Create a new game.
@@ -247,35 +247,11 @@ public class MainGame implements Screen {
 			return;
 		}
 		
-		// Create test bodies.
-		createTestBody();
+		// Create world.
+		new StaticBarrier();
 		Ground.fillWorld(world);
 		// Set the contact listener for the world, for collisions.
 		world.setContactListener(new MainGameContactListener());
-	}
-	
-	/**
-	 * TODO: Remove
-	 */
-	private void createTestBody()
-	{
-		/*
-		Random r = new Random();
-		int i = 0;
-		for (int x = -Gdx.graphics.getWidth() / 2 + 20; x < Gdx.graphics.getWidth() / 2 - 20; x += 20) {
-			for (int y = -Gdx.graphics.getHeight() / 2 - 100; y < Gdx.graphics.getHeight() / 2 - 20; y += 20) {
-				DynamicCircle dynCircle = new DynamicCircle();
-				dynCircle.setPosition(new Vector2(x, y));
-				dynCircle.addToWorld(level.getWorld());
-				i++;
-			}
-		}
-		Utils.print(i);*/
-		
-		new StaticBarrier();
-		
-		//currentPlayer = new Player(new Vector2(-30,(camera.viewportHeight / -2) + 10f));		
-		//players.add(currentPlayer);
 	}
 	
 	public void endContact(Contact contact) {
@@ -380,8 +356,6 @@ public class MainGame implements Screen {
 
 	@Override
 	public void dispose() {}
-	
-
 }
 
 class MainGameContactListener implements ContactListener {	
