@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project Liero-desktop with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="D:/Coding/School/proftaakp56/Liero/Liero-desktop/bin/Liero.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="com.lierojava.Main"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ bodyeditor-loader.jar gdx.jar tween-engine-api.jar kryo-2.20.jar kryonet-2.21.jar objenesis-1.2.jar asm-4.0.jar jsonbeans-0.5.jar minlog-none-1.2.jar reflectasm-1.07.jar gdx-backend-lwjgl-natives.jar gdx-backend-lwjgl.jar gdx-natives.jar"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="D:/Coding/School/proftaakp56/Liero/Liero-desktop/bin">
+                <exclude name="Liero.jar"/>
+            </fileset>
+            <fileset dir="D:/Coding/School/proftaakp56/Liero/Liero/bin"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="bodyeditor-loader.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="gdx.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="tween-engine-api.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="kryo-2.20.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="kryonet-2.21.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="objenesis-1.2.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="asm-4.0.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="jsonbeans-0.5.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="minlog-none-1.2.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero\libs" includes="reflectasm-1.07.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero-desktop\libs" includes="gdx-backend-lwjgl-natives.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero-desktop\libs" includes="gdx-backend-lwjgl.jar"/>
+            <zipfileset dir="D:\Coding\School\proftaakp56\Liero\Liero-desktop\libs" includes="gdx-natives.jar"/>
+        </jar>
+    </target>
+</project>
