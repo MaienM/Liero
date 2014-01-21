@@ -96,7 +96,9 @@ public class MainGame implements Screen {
 		isHost = true;
 		
 		// Create a new sprite batch.
+		
 		batch = new SpriteBatch();
+		
 	}
 
 	/**
@@ -179,6 +181,10 @@ public class MainGame implements Screen {
 	 * Process user input.
 	 */
 	private void handleInput() {
+		if (iph == null) {
+			return;
+		}
+		
 		// Movement.
 		if (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
 			iph.moveRight();

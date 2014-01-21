@@ -1,7 +1,7 @@
 package com.lierojava.weapons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
+import com.lierojava.Constants;
 import com.lierojava.bullets.GrenadeBullet;
 import com.lierojava.participants.Player;
 
@@ -13,7 +13,7 @@ public class Grenade extends Weapon {
 		fireRate = 0.1f;
 		fireSound = Gdx.audio.newSound(Gdx.files.internal("sounds/grenadeThrow.mp3"));
 		bulletClass = GrenadeBullet.class;
-		icon = new Texture(Gdx.files.internal("textures/icon_grenade.png"));
+		icon = Constants.ICON_GRENADE;
 	}
 	public Grenade(Player p) {
 		this();

@@ -140,6 +140,9 @@ public class Liero extends Game implements ApplicationListener {
 		java.lang.RuntimeException.class,
 		java.lang.StackTraceElement[].class,
 		java.lang.StackTraceElement.class,
+		
+		com.badlogic.gdx.Audio.class,
+		com.badlogic.gdx.audio.Sound.class,
 	};
 	
 	/**
@@ -174,9 +177,12 @@ public class Liero extends Game implements ApplicationListener {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				host = "127.0.0.1";
 			}
 		} 
-		else {
+		
+		
+		if (host != null) {
 			startClient();
 		}
 	}
@@ -232,9 +238,9 @@ public class Liero extends Game implements ApplicationListener {
 			//RemoteObject ro = (RemoteObject)game.iph;
 			//ro.setNonBlocking(true);
 			
-			//IHostParticipant ihp = new HostParticipant();
-			//GlobalState.objectSpace.register(++GlobalState.objectSpaceIndex, ihp);
-			//game.iph.register(GlobalState.objectSpaceIndex);
+			IHostParticipant ihp = new HostParticipant();
+			GlobalState.objectSpace.register(++GlobalState.objectSpaceIndex, ihp);
+			game.iph.register(GlobalState.objectSpaceIndex);
 			
 			//ro.setNonBlocking(false);
 		}

@@ -1,7 +1,5 @@
 package com.lierojava.net.interfaces;
 
-import java.io.Serializable;
-
 import com.lierojava.participants.Player;
 
 /**
@@ -9,7 +7,7 @@ import com.lierojava.participants.Player;
  * 
  * @author Michon
  */
-public interface IParticipantHost extends Serializable {
+public interface IParticipantHost {
 	/**
 	 * @see Player.moveLeft
 	 */

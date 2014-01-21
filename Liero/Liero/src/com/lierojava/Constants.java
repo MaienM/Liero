@@ -89,4 +89,8 @@ public final class Constants {
 	 * The Dimensions of a ground block for both x and y
 	 */
 	public static final int GROUND_DIM = 25;
+	
+	public static final Texture ICON_PISTOL = new Texture(Gdx.files.internal("textures/icon_gun.png"));
+	public static final Texture ICON_SHOTGUN = new Texture(Gdx.files.internal("textures/icon_shotgun.png"));
+	public static final Texture ICON_GRENADE = new Texture(Gdx.files.internal("textures/icon_grenade.png"));
 }

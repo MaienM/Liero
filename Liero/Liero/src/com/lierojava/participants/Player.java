@@ -349,6 +349,7 @@ public class Player extends Participant {
 											  r.nextFloat() * Gdx.graphics.getHeight() * 0.8f - Gdx.graphics.getHeight() * 0.4f), 
 								  0); 
 				
+				
 				//Remove any ground objects the player would collide with on spawn
 				//Perform microstep to calculate collisions of the newly created player
 				GlobalState.currentGame.world.step(1f/120f, 8, 3);

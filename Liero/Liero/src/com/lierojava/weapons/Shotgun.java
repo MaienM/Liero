@@ -1,7 +1,7 @@
 package com.lierojava.weapons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
+import com.lierojava.Constants;
 import com.lierojava.bullets.ShotgunBullet;
 import com.lierojava.participants.Player;
 
@@ -13,7 +13,7 @@ public class Shotgun extends Weapon {
 		fireRate = 0.1f;
 		fireSound = Gdx.audio.newSound(Gdx.files.internal("sounds/shotgun.mp3"));
 		bulletClass = ShotgunBullet.class;
-		icon = new Texture(Gdx.files.internal("textures/icon_shotgun.png"));
+		icon = Constants.ICON_SHOTGUN;
 	}
 	public Shotgun(Player p) {
 		this();
