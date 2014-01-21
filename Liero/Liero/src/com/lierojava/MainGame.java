@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.HUD;
 import com.lierojava.net.interfaces.IHostParticipant;
@@ -121,6 +122,10 @@ public class MainGame implements Screen {
 		
 		// Draw the background.
 		batch.draw(backgroundTexture, -Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		for (Ground g : Ground.groundObjects) {
+			g.render(batch);
+		}
 		
 		// Render the players.
 		for (Player p : players) {
@@ -235,7 +240,7 @@ public class MainGame implements Screen {
 		
 		// Create test bodies.
 		createTestBody();
-
+		Ground.fillWorld(world);
 		// Set the contact listener for the world, for collisions.
 		world.setContactListener(new MainGameContactListener());
 	}
@@ -304,6 +309,23 @@ public class MainGame implements Screen {
 		if (bodyB.isBullet()) {
 			bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 		}
+		
+		if (bodyA.getUserData() instanceof Ground) {
+			if (((Ground) bodyA.getUserData()).damage <= 0) {
+				Ground.groundObjects.remove(bodyA.getUserData());
+				bodyA.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+			} else {
+				((Ground) bodyA.getUserData()).damage--;
+			}
+		}
+		if (bodyB.getUserData() instanceof Ground) {
+			if (((Ground) bodyB.getUserData()).damage <= 0) {
+				Ground.groundObjects.remove(bodyB.getUserData());
+				bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+			} else {
+				((Ground) bodyB.getUserData()).damage--;
+			}
+		}
 	}	
 	
 	/**
@@ -336,6 +358,8 @@ public class MainGame implements Screen {
 
 	@Override
 	public void dispose() {}
+	
+
 }
 
 class MainGameContactListener implements ContactListener {	

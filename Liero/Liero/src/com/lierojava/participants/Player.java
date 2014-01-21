@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Array;
 import com.lierojava.Constants;
 import com.lierojava.GlobalState;
 import com.lierojava.Utils;
+import com.lierojava.gameobjects.Ground;
 import com.lierojava.userdata.SimpleUserData;
 import com.lierojava.weapons.Jetpack;
 import com.lierojava.weapons.Pistol;
@@ -227,6 +228,25 @@ public class Player extends Participant {
 				isTouchingGround = true;
 				break;
 			}
+			//Checks if we are standing on ground
+			//When stading on ground we assume it is below the player position
+			// TODO: Implement something actually useable
+			if (c.getFixtureA().getBody().getUserData() instanceof Ground) {
+				if (c.getFixtureA().getBody().getPosition().y < this.body.getPosition().y  &&
+						c.getFixtureA().getBody().getPosition().x < this.body.getPosition().x - 2 && 
+						c.getFixtureA().getBody().getPosition().x < this.body.getPosition().x + 22) {
+					isTouchingGround = true;
+					break;	
+				}
+			} else if (c.getFixtureB().getBody().getUserData() instanceof Ground) {
+				if (c.getFixtureB().getBody().getPosition().y < this.body.getPosition().y &&
+						c.getFixtureB().getBody().getPosition().x - 2 < this.body.getPosition().x && 
+						c.getFixtureB().getBody().getPosition().x < this.body.getPosition().x + 22) {
+					isTouchingGround = true;
+					break;	
+				}
+			}
+			
 		}
 		
 		if (isTouchingGround) {

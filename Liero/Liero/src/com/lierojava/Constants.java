@@ -1,6 +1,7 @@
 package com.lierojava;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 public final class Constants {
@@ -78,4 +79,14 @@ public final class Constants {
 	 * The KryoNet buffer size.
 	 */
 	public static final int BUFFER_SIZE = 512 * 1024 * 1024;
+	
+	/**
+	 * The texture used to display the ground
+	 */
+	public static Texture GROUND_TEXTURE = new Texture(Gdx.files.internal("textures/ground.jpg"));
+	
+	/**
+	 * The Dimensions of a ground block for both x and y
+	 */
+	public static final int GROUND_DIM = 25;
 }
