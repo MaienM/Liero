@@ -124,6 +124,24 @@ public class Player extends Participant {
 		box.dispose();
 				
 		currentWeapon = new Pistol(this);
+		
+		//Remove any ground objects the player would collide with on spawn
+		//Perform microstep to calculate collisions of the newly created player
+		GlobalState.currentGame.world.step(1f/120f, 8, 3);
+		Array<Contact> contacts = Utils.getContacts(body);
+		for (Contact c : contacts) {
+			if (c.getFixtureA().getBody().getUserData() instanceof Ground) {
+				Body fa = c.getFixtureA().getBody();
+				Ground.groundObjects.remove(fa.getUserData());
+				fa.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+			}
+			if (c.getFixtureB().getBody().getUserData() instanceof Ground) {
+				Body fb = c.getFixtureB().getBody();
+				Ground.groundObjects.remove(fb.getUserData());
+				fb.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+			}
+			
+		}
 	}
 	
 	public static void setup() {
