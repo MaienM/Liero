@@ -375,7 +375,7 @@ public class Player extends Participant {
 	 * Use the jetpack.
 	 */
 	public void jetpack() {
-		jetpack.fire(180);
+		jetpack.fire((float) Math.PI);
 	}
 	
 	/**

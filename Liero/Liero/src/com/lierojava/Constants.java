@@ -63,7 +63,7 @@ public final class Constants {
 	/**
 	 * The distance between the player center and the bullet spawn position.
 	 */
-	public static final float WEAPON_OFFSET = 17f;
+	public static final float WEAPON_OFFSET = 22f;
 	
 	/**
 	 * The size of the static barrier around the level.

@@ -1,6 +1,6 @@
 package com.lierojava.weapons;
 
-import com.lierojava.bullets.PistolBullet;
+import com.lierojava.bullets.JetpackBullet;
 import com.lierojava.participants.Player;
 
 public class Jetpack extends Weapon {
@@ -10,7 +10,7 @@ public class Jetpack extends Weapon {
 		knockbackForce = 2f;
 		fireRate = 0.15f;
 		fireSound = null;
-		bulletClass = PistolBullet.class;
+		bulletClass = JetpackBullet.class;
 	}
 	public Jetpack(Player p) {
 		this();		

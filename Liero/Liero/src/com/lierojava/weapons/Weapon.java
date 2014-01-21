@@ -121,6 +121,6 @@ public abstract class Weapon {
 		}
 		
 		// Apply knockback.
-		player.getBody().applyLinearImpulse(Utils.angleToVector(angle + 90).scl(knockbackForce * 1000), player.getBody().getWorldCenter(), true);
+		player.getBody().applyLinearImpulse(Utils.angleToVector(angle + (float) Math.PI).scl(knockbackForce * 1000), player.getBody().getWorldCenter(), true);
 	}
 }

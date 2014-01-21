@@ -315,6 +315,26 @@ public class MainGame implements Screen {
 				p.doDamage(((Bullet)bodyA.getUserData()).damage);
 			}
 		}
+
+		
+		//Handle ground damage
+		if (bodyA.getUserData() instanceof Ground) {
+			if (((Ground) bodyA.getUserData()).damage <= 0) {
+				Ground.groundObjects.remove(bodyA.getUserData());
+				bodyA.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+			} else {
+				((Ground) bodyA.getUserData()).damage -= ((Bullet) bodyB.getUserData()).damage;
+			}
+		}
+		if (bodyB.getUserData() instanceof Ground) {
+			if (((Ground) bodyB.getUserData()).damage <= 0) {
+				Ground.groundObjects.remove(bodyB.getUserData());
+				bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+			} else {
+				((Ground) bodyB.getUserData()).damage -= ((Bullet) bodyA.getUserData()).damage;
+			}
+		}
+		
 		
 		// Remove the bullets.
 		if (bodyA.getUserData() != bodyB.getUserData()) {
@@ -323,23 +343,6 @@ public class MainGame implements Screen {
 			}
 			if (bodyB.isBullet()) {
 				bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
-			}
-		}
-		
-		if (bodyA.getUserData() instanceof Ground) {
-			if (((Ground) bodyA.getUserData()).damage <= 0) {
-				Ground.groundObjects.remove(bodyA.getUserData());
-				bodyA.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
-			} else {
-				((Ground) bodyA.getUserData()).damage--;
-			}
-		}
-		if (bodyB.getUserData() instanceof Ground) {
-			if (((Ground) bodyB.getUserData()).damage <= 0) {
-				Ground.groundObjects.remove(bodyB.getUserData());
-				bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
-			} else {
-				((Ground) bodyB.getUserData()).damage--;
 			}
 		}
 	}	

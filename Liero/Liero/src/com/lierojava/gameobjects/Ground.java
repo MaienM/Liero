@@ -23,7 +23,7 @@ public class Ground {
 	/*
 	 * The damage this ground object can still take
 	 */
-	public int damage = 3;
+	public int damage = 30;
 	
 	/**
 	 * The groundObjects that still exist
