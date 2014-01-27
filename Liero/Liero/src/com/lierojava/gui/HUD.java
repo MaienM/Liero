@@ -1,55 +1,49 @@
 package com.lierojava.gui;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import java.util.ArrayList;
+
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.lierojava.Constants;
 import com.lierojava.GlobalState;
 import com.lierojava.Utils;
+import com.lierojava.net.RenderProxy;
 import com.lierojava.participants.Player;
 
-public class HUD {
-	/**
-	 * The crosshair texture.
-	 */
-	private static Texture crosshairTexture = new Texture(Gdx.files.internal("textures/crosshair.png"));
-	
-	/**
-	 * The crosshair texture.
-	 */
-	private static Texture healthBorderTexture = new Texture(Gdx.files.internal("textures/healthBorder.png"));
-	
-	/**
-	 * The crosshair texture.
-	 */
-	private static Texture healthTexture = new Texture(Gdx.files.internal("textures/healthBar.png"));
-	
+public class HUD {	
 	public HUD() {
 	}
 	
-	public void render(SpriteBatch batch) {
+	public ArrayList<RenderProxy> render() {
+		ArrayList<RenderProxy> proxies = new ArrayList<RenderProxy>();
+		
+		TextureRegion crosshairTexture = Constants.TEXTURES.findRegion("crosshair");
+		TextureRegion healthBorderTexture = Constants.TEXTURES.findRegion("health_border");
+		TextureRegion healthBarTexture = Constants.TEXTURES.findRegion("health_bar");
+		
 		for (Player player : GlobalState.currentGame.players) {
 			// Render the crosshair.
 			Vector2 playerPosition = player.getBody().getPosition();
 			Vector2 aimOffset = Utils.angleToVector(player.getAim());
 			aimOffset.scl(Constants.CROSSHAIR_OFFSET);
-			Vector2 size = new Vector2(crosshairTexture.getWidth(), crosshairTexture.getHeight());
-			size.scl(Constants.CROSSHAIR_SCALE);
-			batch.draw(crosshairTexture, playerPosition.x + aimOffset.x - size.x / 2, playerPosition.y + aimOffset.y - size.y / 2, size.x, size.y);
+			Vector2 size = new Vector2(crosshairTexture.getRegionWidth(), crosshairTexture.getRegionHeight());
+			
+			proxies.add(new RenderProxy("crosshair", new Vector2(playerPosition.x + aimOffset.x - size.x / 2, playerPosition.y + aimOffset.y - size.y / 2), size));
 			
 			// TODO: Render the weapon data (reload, charge, etc).
 			// TODO: Render the game data (time, etc).
 			
 			// Health bar.
-			batch.draw(healthBorderTexture, playerPosition.x - healthBorderTexture.getWidth() / 2, playerPosition.y + healthBorderTexture.getHeight() + 10, healthBorderTexture.getWidth(), healthBorderTexture.getHeight());
-			batch.draw(healthTexture, playerPosition.x - healthTexture.getWidth() / 2, playerPosition.y + healthTexture.getHeight() + 10, healthTexture.getWidth() * player.getHealth() / 100f, healthTexture.getHeight());
+			proxies.add(new RenderProxy("health_border", new Vector2(playerPosition.x - healthBorderTexture.getRegionWidth() / 2, playerPosition.y + healthBorderTexture.getRegionHeight() + 10)));
+			proxies.add(new RenderProxy("health_bar", new Vector2(playerPosition.x - healthBarTexture.getRegionWidth() / 2, playerPosition.y + healthBarTexture.getRegionHeight() + 10), new Vector2(healthBarTexture.getRegionWidth() * player.getHealth() / 100f, healthBarTexture.getRegionHeight())));
 			
 			// Weapon icon.
-			if (player.showWeapon) {
-				Texture t = player.currentWeapon.icon; 
-				batch.draw(t, playerPosition.x - t.getWidth() / 2, playerPosition.y + 20, t.getWidth(), t.getHeight());
+			if (player.showWeapon) { 
+				TextureRegion t = Constants.TEXTURES.findRegion(player.currentWeapon.icon);
+				proxies.add(new RenderProxy(player.currentWeapon.icon, new Vector2(playerPosition.x - t.getRegionWidth() / 2, playerPosition.y + 20)));
 			}
 		}
+		
+		return proxies;
 	}
 }

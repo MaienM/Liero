@@ -1,7 +1,10 @@
 package com.lierojava.net.handles;
 
+import java.util.ArrayList;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.lierojava.GlobalState;
+import com.lierojava.net.RenderProxy;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
 
@@ -88,5 +91,12 @@ public class ParticipantHost implements IParticipantHost {
 		/*
 		IHostParticipant ihp = ObjectSpace.getRemoteObject(connection, index, IHostParticipant.class);
 		GlobalState.currentGame.ihps.add(ihp);*/
+	}
+	
+	@Override
+	public ArrayList<RenderProxy> getRenderProxies() {
+		synchronized (GlobalState.currentGame.renderProxies) {
+			return (ArrayList<RenderProxy>)GlobalState.currentGame.renderProxies.clone();
+		}
 	}
 }

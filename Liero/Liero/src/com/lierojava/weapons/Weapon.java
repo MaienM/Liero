@@ -1,7 +1,6 @@
 package com.lierojava.weapons;
 
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.lierojava.Constants;
 import com.lierojava.Utils;
@@ -57,7 +56,7 @@ public abstract class Weapon {
 	/**
 	 * The icon for this weapon.
 	 */
-	public Texture icon;
+	public String icon;
 	
 	/**
 	 * Setup a new weapon.

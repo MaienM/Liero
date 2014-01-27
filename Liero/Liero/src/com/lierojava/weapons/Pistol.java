@@ -1,7 +1,6 @@
 package com.lierojava.weapons;
 
 import com.badlogic.gdx.Gdx;
-import com.lierojava.Constants;
 import com.lierojava.bullets.PistolBullet;
 import com.lierojava.participants.Player;
 
@@ -13,7 +12,7 @@ public class Pistol extends Weapon {
 		fireRate = 1f;
 		fireSound = Gdx.audio.newSound(Gdx.files.internal("sounds/gun.mp3"));
 		bulletClass = PistolBullet.class;
-		icon = Constants.ICON_PISTOL;
+		icon = "icon_gun";
 	}
 	public Pistol(Player p) {
 		this();

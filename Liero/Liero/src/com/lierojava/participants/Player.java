@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -18,7 +16,10 @@ import com.badlogic.gdx.utils.Array;
 import com.lierojava.Constants;
 import com.lierojava.GlobalState;
 import com.lierojava.Utils;
+import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
+import com.lierojava.gameobjects.StaticBarrier;
+import com.lierojava.net.RenderProxy;
 import com.lierojava.userdata.PendingAction;
 import com.lierojava.userdata.SimpleUserData;
 import com.lierojava.weapons.Grenade;
@@ -27,23 +28,13 @@ import com.lierojava.weapons.Pistol;
 import com.lierojava.weapons.Shotgun;
 import com.lierojava.weapons.Weapon;
 
-public class Player extends Participant {
+public class Player extends GameObject {
 	/**
 	 * The Box2D body for the player. 
 	 * 
 	 * This stores data such as position and velocity.
 	 */
 	private Body body;
-	
-	/**
-	 * The player textures.
-	 */
-	private static TextureRegion faceLeftTexture, faceRightTexture;
-	
-	/**
-	 * The walking animations.
-	 */
-	private static Animation walkLeftAnimation, walkRightAnimation;
 	
 	/**
 	 * The current statetime of the walking animation.
@@ -86,11 +77,6 @@ public class Player extends Participant {
 	private PlayerState state = PlayerState.faceRight;
 	
 	/**
-	 * The current health.
-	 */
-	private int health = 100;
-	
-	/**
 	 * Whether to show the weapon in the hud.
 	 */
 	public boolean showWeapon = false;
@@ -125,12 +111,10 @@ public class Player extends Participant {
 		bodyDef.position.set(postion);
 		bodyDef.fixedRotation = true;
 		body = GlobalState.currentGame.world.createBody(bodyDef);
+		body.setUserData(this);
 				
 		// Create the player shape.
 		PolygonShape box = new PolygonShape();
-		// Set the polygon shape as a box which is twice the size of our view
-		// port and 20 high
-		// (setAsBox takes half-width and half-height as arguments)
 		box.setAsBox(10.0f, 10.0f);
 		
 		// Create the fixture.
@@ -144,58 +128,42 @@ public class Player extends Participant {
 		// Cleanup.
 		box.dispose();
 	}
-	
-	public static void setup() {
-		// Texture loading.
-		faceRightTexture = Constants.TEXTURES.findRegion("slice38");
-		faceLeftTexture = new TextureRegion(faceRightTexture);
-		faceLeftTexture.flip(true, false);
-		
-		// Create the animations.
-		final TextureRegion[] walkRightFrames = new TextureRegion[5];
-		for (int i = 0; i < 5; i++) {
-			walkRightFrames[i] = Constants.TEXTURES.findRegion("slice" + (i + 38));
-		}
-
-		final TextureRegion[] walkLeftFrames = new TextureRegion[5];
-		for (int i = 0; i < 5; i++) {
-			walkLeftFrames[i] = new TextureRegion(walkRightFrames[i]);
-			walkLeftFrames[i].flip(true, false);
-		}
-		
-		walkRightAnimation = new Animation(Constants.PLAYER_ANIMATION_SPEED, new Array<TextureRegion>(walkRightFrames), Animation.LOOP);
-		walkLeftAnimation = new Animation(Constants.PLAYER_ANIMATION_SPEED, new Array<TextureRegion>(walkLeftFrames), Animation.LOOP);
-	}
 
 	/**
 	 * Render the player.
+	 * @return 
 	 */
-	public void render(SpriteBatch batch) {
+	@SuppressWarnings("incomplete-switch")
+	public RenderProxy render() {
+		RenderProxy rp = new RenderProxy();
+		
 		// Determine current texture.
-		TextureRegion texture = null;
 		animationStateTime += Gdx.graphics.getDeltaTime();
 		switch (state) {
 			case faceLeft:
-				texture = faceLeftTexture;
-				break;
-				
 			case faceRight:
-				texture = faceRightTexture;
+				rp.textureRegion = "player0";
 				break;
 				
 			case moveLeft:
-				texture = walkLeftAnimation.getKeyFrame(animationStateTime);
-				break;
-
 			case moveRight:
-				texture = walkRightAnimation.getKeyFrame(animationStateTime); 
+				rp.textureRegion = "player" + (int)(animationStateTime / Constants.PLAYER_ANIMATION_SPEED) % Constants.PLAYER_ANIMATION_SIZE;
+				break;
+		}
+		switch (state) {
+			case faceLeft:
+			case moveLeft:
+				rp.flipX = true;
 				break;
 		}
 
 		// Draw texture.
-		Vector2 position = body.getPosition();
-		Vector2 size = new Vector2(texture.getRegionWidth() * Constants.TEXTURE_SCALE, texture.getRegionHeight() * Constants.TEXTURE_SCALE);
-		batch.draw(texture, position.x - size.x / 2, position.y - size.y / 2, size.x, size.y);
+		rp.position = new Vector2(body.getPosition());
+		TextureRegion texture = Constants.TEXTURES.findRegion(rp.textureRegion);
+		rp.size = new Vector2(texture.getRegionWidth() * Constants.PLAYER_TEXTURE_SCALE, texture.getRegionHeight() * Constants.PLAYER_TEXTURE_SCALE);
+		rp.position.x -= texture.getRegionWidth();
+		rp.position.y -= texture.getRegionHeight();
+		return rp;
 	}
 
 	/**
@@ -242,22 +210,17 @@ public class Player extends Participant {
 	public void jump() {
 		boolean isTouchingGround = false;
 		for (Contact c : Utils.getContacts(body)) {
-			if (c.getFixtureA().getBody().getUserData() == SimpleUserData.FLOOR ||
-				c.getFixtureB().getBody().getUserData() == SimpleUserData.FLOOR) {
-				isTouchingGround = true;
-				break;
-			}
 			//Checks if we are standing on ground
 			//When stading on ground we assume it is below the player position
 			// TODO: Implement something actually useable
-			if (c.getFixtureA().getBody().getUserData() instanceof Ground) {
+			if (c.getFixtureA().getBody().getUserData() instanceof Ground || c.getFixtureA().getBody().getUserData() instanceof StaticBarrier) {
 				if (c.getFixtureA().getBody().getPosition().y < this.body.getPosition().y  &&
 						c.getFixtureA().getBody().getPosition().x < this.body.getPosition().x - 2 && 
 						c.getFixtureA().getBody().getPosition().x < this.body.getPosition().x + 22) {
 					isTouchingGround = true;
 					break;	
 				}
-			} else if (c.getFixtureB().getBody().getUserData() instanceof Ground) {
+			} else if (c.getFixtureB().getBody().getUserData() instanceof Ground || c.getFixtureB().getBody().getUserData() instanceof StaticBarrier) {
 				if (c.getFixtureB().getBody().getPosition().y < this.body.getPosition().y &&
 						c.getFixtureB().getBody().getPosition().x - 2 < this.body.getPosition().x && 
 						c.getFixtureB().getBody().getPosition().x < this.body.getPosition().x + 22) {
@@ -314,34 +277,22 @@ public class Player extends Participant {
 	public Body getBody() {
 		return body;
 	}
-	
-	/**
-	 * Deal damage to the player.
-	 * 
-	 * @param amount The amount of damage to deal.
-	 */
-	public void doDamage(int amount) {
-		if (health <= 0) {
-			return;
-		}
-		health -= amount;
-		if (health <= 0) {
-			die();
-		}
-	}
 		
 	/**
 	 * TODO: Implement.
 	 */
-	private void die() {
+	@Override
+	protected void die() {
 		spawn();
 	}
 	
+	/**
+	 * (Re)spawn the player.
+	 */
 	private void spawn() {
-		final Object oldUserData = body.getUserData();
-		body.setUserData(new PendingAction() {
+		new PendingAction(body) {			
 			@Override
-			public void run(Body body) {
+			public void run() {
 				health = 100;
 				
 				Random r = new Random();
@@ -357,19 +308,15 @@ public class Player extends Participant {
 				for (Contact c : contacts) {
 					if (c.getFixtureA().getBody().getUserData() instanceof Ground) {
 						Body fa = c.getFixtureA().getBody();
-						Ground.groundObjects.remove(fa.getUserData());
 						fa.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 					}
-					if (c.getFixtureB().getBody().getUserData() instanceof Ground) {
+					else if (c.getFixtureB().getBody().getUserData() instanceof Ground) {
 						Body fb = c.getFixtureB().getBody();
-						Ground.groundObjects.remove(fb.getUserData());
 						fb.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 					}
 				}				
-				
-				body.setUserData(oldUserData);
 			}
-		});
+		};
 	}
 
 	/**

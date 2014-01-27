@@ -1,16 +1,14 @@
 package com.lierojava.bullets;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.lierojava.Utils;
 
 public class ShotgunBullet extends Bullet {
 	public ShotgunBullet() {
-		size = new Vector2(0.3f, 0.3f);
+		size = new Vector2(0.5f, 0.5f);
 		speed = 1;
-		damage = 7;
-		texture = new Texture(Gdx.files.internal("textures/bullet.png"));
+		health = 7;
+		textureRegion = "bullet";
 	}
 	
 	@Override

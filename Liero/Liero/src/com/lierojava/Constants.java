@@ -1,10 +1,14 @@
 package com.lierojava;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 public final class Constants {
+	/**
+	 * The port over which the server communicates.
+	 */
+	public static final int PORT = 29992;
+	
 	/**
 	 * Conversion from screen units to Box2D units.
 	 */
@@ -29,22 +33,27 @@ public final class Constants {
 	 * The players aim speed.
 	 */
 	public static final float PLAYER_AIM_SPEED = 0.05f;
+
+	/**
+	 * The animation speed of the moving worm.
+	 */
+	public static final float PLAYER_ANIMATION_SPEED = 0.03f;
 	
 	/**
 	 * The animation speed of the moving worm.
 	 */
-	public static final float PLAYER_ANIMATION_SPEED = 0.1f;
-	
+	public static final int PLAYER_ANIMATION_SIZE = 13;
+
+	/**
+	 * The scale of the player textures on screen.
+	 */
+	public static final float PLAYER_TEXTURE_SCALE = 2f;
+
 	/**
 	 * The main textureatlas.
 	 */
-	public static TextureAtlas TEXTURES = new TextureAtlas(Gdx.files.internal("textures/textures.pack"));
+	public static TextureAtlas TEXTURES = new TextureAtlas(Gdx.files.internal("textures.pack"));
 	
-	/**
-	 * The scale of the textures on screen.
-	 */
-	public static final float TEXTURE_SCALE = 2f;
-
 	/**
 	 * The scale of the crosshair on screen.
 	 */
@@ -71,26 +80,7 @@ public final class Constants {
 	public static final float BARRIER_SIZE = 10f;
 	
 	/**
-	 * The port over which the server communicates.
+	 * The dimensions of a ground block for both x and y
 	 */
-	public static final int PORT = 29992;
-	
-	/**
-	 * The KryoNet buffer size.
-	 */
-	public static final int BUFFER_SIZE = 512 * 1024 * 1024;
-	
-	/**
-	 * The texture used to display the ground
-	 */
-	public static Texture GROUND_TEXTURE = new Texture(Gdx.files.internal("textures/ground.jpg"));
-	
-	/**
-	 * The Dimensions of a ground block for both x and y
-	 */
-	public static final int GROUND_DIM = 25;
-	
-	public static final Texture ICON_PISTOL = new Texture(Gdx.files.internal("textures/icon_gun.png"));
-	public static final Texture ICON_SHOTGUN = new Texture(Gdx.files.internal("textures/icon_shotgun.png"));
-	public static final Texture ICON_GRENADE = new Texture(Gdx.files.internal("textures/icon_grenade.png"));
+	public static final int GROUND_SIZE = 25;
 }

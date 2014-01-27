@@ -1,0 +1,180 @@
+
+textures.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+icon_grenade
+  rotate: false
+  xy: 1, 18
+  size: 45, 45
+  orig: 45, 45
+  offset: 0, 0
+  index: -1
+icon_gun
+  rotate: false
+  xy: 48, 18
+  size: 45, 45
+  orig: 45, 45
+  offset: 0, 0
+  index: -1
+icon_lasergun
+  rotate: false
+  xy: 95, 18
+  size: 45, 45
+  orig: 45, 45
+  offset: 0, 0
+  index: -1
+icon_rocket
+  rotate: false
+  xy: 142, 18
+  size: 45, 45
+  orig: 45, 45
+  offset: 0, 0
+  index: -1
+icon_shotgun
+  rotate: false
+  xy: 189, 18
+  size: 45, 45
+  orig: 45, 45
+  offset: 0, 0
+  index: -1
+ground
+  rotate: false
+  xy: 236, 38
+  size: 25, 25
+  orig: 25, 25
+  offset: 0, 0
+  index: -1
+crosshair
+  rotate: false
+  xy: 263, 43
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: -1
+slice51
+  rotate: false
+  xy: 1, 1
+  size: 10, 15
+  orig: 10, 15
+  offset: 0, 0
+  index: 51
+health_bar
+  rotate: false
+  xy: 285, 58
+  size: 30, 5
+  orig: 30, 5
+  offset: 0, 0
+  index: -1
+health_border
+  rotate: false
+  xy: 13, 11
+  size: 30, 5
+  orig: 30, 5
+  offset: 0, 0
+  index: -1
+slice45
+  rotate: false
+  xy: 236, 22
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: 45
+slice38
+  rotate: false
+  xy: 285, 42
+  size: 13, 14
+  orig: 13, 14
+  offset: 0, 0
+  index: 38
+slice43
+  rotate: false
+  xy: 300, 42
+  size: 13, 14
+  orig: 13, 14
+  offset: 0, 0
+  index: 43
+slice39
+  rotate: false
+  xy: 252, 22
+  size: 10, 14
+  orig: 10, 14
+  offset: 0, 0
+  index: 39
+slice44
+  rotate: false
+  xy: 264, 27
+  size: 13, 14
+  orig: 13, 14
+  offset: 0, 0
+  index: 44
+slice46
+  rotate: false
+  xy: 279, 26
+  size: 13, 14
+  orig: 13, 14
+  offset: 0, 0
+  index: 46
+slice42
+  rotate: false
+  xy: 294, 26
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: 42
+slice40
+  rotate: false
+  xy: 308, 26
+  size: 11, 14
+  orig: 11, 14
+  offset: 0, 0
+  index: 40
+slice47
+  rotate: false
+  xy: 315, 42
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: 47
+slice48
+  rotate: false
+  xy: 321, 26
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: 48
+slice49
+  rotate: false
+  xy: 329, 49
+  size: 11, 14
+  orig: 11, 14
+  offset: 0, 0
+  index: 49
+slice41
+  rotate: false
+  xy: 342, 50
+  size: 11, 13
+  orig: 11, 13
+  offset: 0, 0
+  index: 41
+slice50
+  rotate: false
+  xy: 355, 49
+  size: 10, 14
+  orig: 10, 14
+  offset: 0, 0
+  index: 50
+grenade
+  rotate: false
+  xy: 367, 53
+  size: 8, 10
+  orig: 8, 10
+  offset: 0, 0
+  index: -1
+bullet
+  rotate: false
+  xy: 317, 58
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1

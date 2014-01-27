@@ -1,5 +1,8 @@
 package com.lierojava.net.interfaces;
 
+import java.util.ArrayList;
+
+import com.lierojava.net.RenderProxy;
 import com.lierojava.participants.Player;
 
 /**
@@ -68,4 +71,10 @@ public interface IParticipantHost {
 	 * @param index The index of the object.
 	 */
 	public abstract void register(int index);
+
+	/**
+	 * Get the render proxies.
+	 * @return The list of render proxies.
+	 */
+	public abstract ArrayList<RenderProxy> getRenderProxies();
 }

@@ -8,9 +8,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.lierojava.Constants;
 import com.lierojava.GlobalState;
-import com.lierojava.userdata.SimpleUserData;
+import com.lierojava.net.RenderProxy;
 
-public class StaticBarrier {
+public class StaticBarrier extends GameObject {
 	/**
 	 * The Box2D body for the floor. 
 	 * 
@@ -40,19 +40,21 @@ public class StaticBarrier {
 	private Body rightWallBody;
 	
 	public StaticBarrier() {
+		health = Integer.MAX_VALUE;
+		
 		// Create the floor.
 		floorBody = createBody(new Vector2(-Gdx.graphics.getWidth() / 2 + 1, -Gdx.graphics.getHeight() / 2), new Vector2(Gdx.graphics.getWidth(), Constants.BARRIER_SIZE));
-		floorBody.setUserData(SimpleUserData.FLOOR);
+		floorBody.setUserData(this);
 		
 		// Create the ceiling.
 		ceilingBody = createBody(new Vector2(-Gdx.graphics.getWidth() / 2 + 1, Gdx.graphics.getHeight() / 2), new Vector2(Gdx.graphics.getWidth(), Constants.BARRIER_SIZE));
-		ceilingBody.setUserData(SimpleUserData.CEILING);
+		ceilingBody.setUserData(this);
 		
 		// Create the walls.
 		leftWallBody = createBody(new Vector2(-Gdx.graphics.getWidth() / 2 + Constants.BARRIER_SIZE, -Gdx.graphics.getHeight() / 2), new Vector2(0, Gdx.graphics.getHeight()));
 		rightWallBody = createBody(new Vector2(Gdx.graphics.getWidth() / 2 - Constants.BARRIER_SIZE, -Gdx.graphics.getHeight() / 2), new Vector2(0, Gdx.graphics.getHeight()));
-		leftWallBody.setUserData(SimpleUserData.WALL);
-		rightWallBody.setUserData(SimpleUserData.WALL);
+		leftWallBody.setUserData(this);
+		rightWallBody.setUserData(this);
 	}
 	
 	
@@ -80,4 +82,19 @@ public class StaticBarrier {
 		
 		return body;
 	}
+
+
+	@Override
+	public RenderProxy render() {
+		return null;
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * These objects don't take damage, and they don't die.
+	 */
+	@Override
+	public void damage(int damage) {}
+	@Override
+	protected void die() {}
 }

@@ -1,6 +1,5 @@
 package com.lierojava.participants;
 
-
-public class Participant {
+public interface Participant {
 
 }

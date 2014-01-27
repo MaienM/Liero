@@ -1,8 +1,5 @@
 package com.lierojava.bullets;
 
-import java.lang.ref.WeakReference;
-
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -11,8 +8,10 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.lierojava.GlobalState;
 import com.lierojava.Utils;
+import com.lierojava.gameobjects.GameObject;
+import com.lierojava.net.RenderProxy;
 
-public abstract class Bullet {
+public abstract class Bullet extends GameObject {
 	/**
 	 * The body of this bullet.
 	 */
@@ -29,14 +28,9 @@ public abstract class Bullet {
 	protected float speed;
 	
 	/**
-	 * The texture of the bullet.
+	 * The texture region of the bullet.
 	 */
-	protected Texture texture;
-	
-	/**
-	 * The damage the bullet does.
-	 */
-	public int damage;
+	protected String textureRegion;
 
 	/**
 	 * @see spawnBullet.
@@ -59,7 +53,6 @@ public abstract class Bullet {
 		bodyDef.bullet = true;
 		body = GlobalState.currentGame.world.createBody(bodyDef);
 		body.setUserData(this);
-		GlobalState.bullets.put(new WeakReference<Body>(body), texture);
 
 		// Create the bullet shape.
 		PolygonShape box = new PolygonShape();
@@ -75,5 +68,14 @@ public abstract class Bullet {
 		
 		// Apply force.
 		body.applyForceToCenter(Utils.angleToVector(angle).scl(10000 * speed), true);
+	}
+	
+	@Override
+	public RenderProxy render() {
+		return new RenderProxy(textureRegion, body.getPosition(), size, body.getAngle());
+	}
+	
+	@Override
+	protected void die() {
 	}
 }

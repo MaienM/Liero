@@ -29,10 +29,10 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import com.esotericsoftware.kryonet.rmi.RemoteObject;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.bullets.PistolBullet;
 import com.lierojava.enums.GameState;
-import com.lierojava.gameobjects.DynamicCircle;
 import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.HUD;
 import com.lierojava.net.handles.HostParticipant;
@@ -86,7 +86,6 @@ public class Liero extends Game implements ApplicationListener {
 		Chatroom.class,
 		Stats.class,
 		GameState.class,
-		DynamicCircle.class,
 		StaticBarrier.class,
 		SimpleUserData.class,
 		Weapon.class,
@@ -168,8 +167,6 @@ public class Liero extends Game implements ApplicationListener {
 		setScreen(GlobalState.currentGame);
 		
 		GlobalState.objectSpace = new ObjectSpace();
-		
-		Player.setup();
 				
 		if (host == null) {
 			try {
@@ -190,7 +187,7 @@ public class Liero extends Game implements ApplicationListener {
 	private void startServer() throws IOException {
 		game.isHost = true;
 		
-		Server server = new Server(1280 * 1024, 160 * 1024);
+		Server server = new Server(12800 * 1024, 1600 * 1024);
 		setupKryo(server.getKryo());
 		server.start();
 		server.bind(Constants.PORT, Constants.PORT);
@@ -221,7 +218,7 @@ public class Liero extends Game implements ApplicationListener {
 	private void startClient() {
 		game.isHost = false;
 		
-		Client client = new Client(640 * 1024, 160 * 1024);
+		Client client = new Client(6400 * 1024, 1600 * 1024);
 		setupKryo(client.getKryo());
 		client.start();
 		try {
@@ -235,14 +232,14 @@ public class Liero extends Game implements ApplicationListener {
 		int index = ihh.requestParticipant(true);
 		if (index > 0) {
 			game.iph = ObjectSpace.getRemoteObject(client, index, IParticipantHost.class);
-			//RemoteObject ro = (RemoteObject)game.iph;
-			//ro.setNonBlocking(true);
+			RemoteObject ro = (RemoteObject)game.iph;
+			ro.setNonBlocking(true);
 			
 			IHostParticipant ihp = new HostParticipant();
 			GlobalState.objectSpace.register(++GlobalState.objectSpaceIndex, ihp);
 			game.iph.register(GlobalState.objectSpaceIndex);
 			
-			//ro.setNonBlocking(false);
+			ro.setNonBlocking(false);
 		}
 	}
 	
