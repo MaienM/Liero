@@ -37,7 +37,7 @@ public class Server {
 			accDao = DaoManager.createDao(connectionSource, Account.class);
 			TableUtils.createTableIfNotExists(connectionSource, Account.class);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			//  TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -56,21 +56,21 @@ public class Server {
 	 */
 	public boolean login(String username, String password) {
 		try {
-			//Fetch the correct account
+			// Fetch the correct account
 			List<Account> accounts = accDao.queryForEq("name", username);
 			
-			//If we don't have exactly one account for the current user, something wierd is going on, 
-			//so we return false
+			// If we don't have exactly one account for the current user, something wierd is going on, 
+			// so we return false
 			if (accounts.size() != 1) {
 				return false;
 			}
 			
-			//Actually check the credentials
+			// Actually check the credentials
 			Account loginAccount = accounts.get(0);
 			return loginAccount.isCorrectPassword(password);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			//Something went wrong, so we return false to be sure nothing too odd happens
+			// Something went wrong, so we return false to be sure nothing too odd happens
 			return false;
 		}
 	}

@@ -27,7 +27,7 @@ public class Account {
 	 */
 	public Account(String username, String password) {
 		this.name = username;
-		//Has to be done using the set method to make sure we generate a new salt
+		// Has to be done using the set method to make sure we generate a new salt
 		this.SetPassword(password);
 		this.kills = 0;
 		this.deaths = 0;
