@@ -74,5 +74,41 @@ public class Server {
 			return false;
 		}
 	}
+	
+	/**
+	 * Checks if a username is available
+	 * 
+	 * @param username The username to check
+	 * @return false if it is available, true if it is taken
+	 */
+	public boolean isUsernameTaken(String username) {
+		try {
+			// Fetch the correct account
+			List<Account> accounts = accDao.queryForEq("name", username);
+			
+			// if the list is empty, the username is free so return true, if not, return false
+			return !accounts.isEmpty();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// Something went wrong, so we return false to be sure nothing too odd happens
+			return false;
+		}
+	}
+	
+	public void register(String username, String password) {
+		Account newAccount = new Account(username, password);
+		try {
+			// The name is not available, return
+			if (isUsernameTaken(username)) {
+				return;
+			}
+			// Create and save and account
+			accDao.create(newAccount);
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// Something went wrong, so we return false to be sure nothing too odd happens
+		}
+	}
 
 }
