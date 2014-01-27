@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="Liero/Liero-android/gen"/>
+	<classpathentry kind="src" path="Liero/Liero-android/src"/>
+	<classpathentry kind="src" path="Liero/Liero-desktop/src"/>
+	<classpathentry kind="src" path="Liero/Liero-html/src"/>
+	<classpathentry kind="src" path="Liero/Liero-robovm/src"/>
+	<classpathentry kind="src" path="Liero/Liero/src"/>
+	<classpathentry kind="lib" path="Liero/Liero-android/libs/gdx-backend-android-sources.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero-android/libs/gdx-backend-android.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero-desktop/libs/gdx-backend-lwjgl-natives.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero-desktop/libs/gdx-backend-lwjgl-sources.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero-desktop/libs/gdx-backend-lwjgl.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero-desktop/libs/gdx-natives.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero-html/war/WEB-INF/lib/gdx-backend-gwt-sources.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero-html/war/WEB-INF/lib/gdx-backend-gwt.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero-robovm/libs/gdx-backend-robovm.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/bodyeditor-loader-sources.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/bodyeditor-loader.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/gdx-sources.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/gdx.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/jboss-serialization.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/kryonet-2.21-all.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/log4j.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/trove.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/tween-engine-api-sources.jar"/>
+	<classpathentry kind="lib" path="Liero/Liero/libs/tween-engine-api.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="Liero/Liero-robovm/bin"/>
+</classpath>

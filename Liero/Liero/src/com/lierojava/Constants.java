@@ -83,4 +83,9 @@ public final class Constants {
 	 * The dimensions of a ground block for both x and y
 	 */
 	public static final int GROUND_SIZE = 25;
+	
+	/**
+	 * The length of the password salt
+	 */
+	public static final int SALT_LENGTH = 32;
 }
