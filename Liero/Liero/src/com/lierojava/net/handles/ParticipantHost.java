@@ -27,7 +27,9 @@ public class ParticipantHost implements IParticipantHost {
 	
 	public ParticipantHost() {}
 	public ParticipantHost(Player player) {
-		this.index = GlobalState.currentGame.players.indexOf(player);
+		if (player != null) {
+			this.index = GlobalState.currentGame.players.indexOf(player);
+		}
 	}
 
 	@Override
@@ -93,6 +95,7 @@ public class ParticipantHost implements IParticipantHost {
 		GlobalState.currentGame.ihps.add(ihp);*/
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<RenderProxy> getRenderProxies() {
 		synchronized (GlobalState.currentGame.renderProxies) {

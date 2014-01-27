@@ -1,6 +1,9 @@
 package com.lierojava;
 
+import java.util.HashMap;
+
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 public final class Constants {
@@ -63,6 +66,16 @@ public final class Constants {
 	 * The main textureatlas.
 	 */
 	public static TextureAtlas TEXTURES = new TextureAtlas(Gdx.files.internal("textures.pack"));
+	
+	/**
+	 * The font map.
+	 */
+	@SuppressWarnings("serial")
+	public static HashMap<String, BitmapFont> FONTS = new HashMap<String, BitmapFont>() {{
+		BitmapFont f = new BitmapFont();
+		f.scale(2);
+		put("CLOCK", f);
+	}};
 	
 	/**
 	 * The scale of the crosshair on screen.

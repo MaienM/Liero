@@ -25,7 +25,6 @@ public class GrenadeBullet extends Bullet {
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				Vector2 start = body.getPosition();

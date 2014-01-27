@@ -17,7 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class inlogScherm.
  */

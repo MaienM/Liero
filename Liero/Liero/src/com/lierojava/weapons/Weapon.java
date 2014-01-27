@@ -3,6 +3,7 @@ package com.lierojava.weapons;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.lierojava.Constants;
+import com.lierojava.GlobalState;
 import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.participants.Player;
@@ -76,7 +77,6 @@ public abstract class Weapon {
 					try {
 						Thread.sleep((int)(regenSpeed * 1000));
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -90,6 +90,10 @@ public abstract class Weapon {
 	 * @param angle The angle at which to fire the weapon.
 	 */
 	public void fire(float angle) {
+		if (GlobalState.currentGame.world.isLocked()) {
+			return;
+		}
+		
 		// If not enough time has elapsed, don't do anything.
 		long currentTime = TimeUtils.millis();
 		if (lastFireTime + (long)(fireRate * 1000) > currentTime) {

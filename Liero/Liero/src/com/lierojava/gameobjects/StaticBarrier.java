@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.lierojava.Constants;
 import com.lierojava.GlobalState;
+import com.lierojava.bullets.Bullet;
 import com.lierojava.net.RenderProxy;
 
 public class StaticBarrier extends GameObject {
@@ -94,7 +95,7 @@ public class StaticBarrier extends GameObject {
 	 * These objects don't take damage, and they don't die.
 	 */
 	@Override
-	public void damage(int damage) {}
+	public void damage(Bullet bullet) {}
 	@Override
-	protected void die() {}
+	protected void die(Bullet bullet) {}
 }

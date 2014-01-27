@@ -10,12 +10,19 @@ import com.lierojava.GlobalState;
 import com.lierojava.Utils;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.net.RenderProxy;
+import com.lierojava.net.TextureRenderProxy;
+import com.lierojava.participants.Player;
 
 public abstract class Bullet extends GameObject {
 	/**
 	 * The body of this bullet.
 	 */
 	protected Body body;
+	
+	/**
+	 * The player that fired this bullet.
+	 */
+	public Player player;
 	
 	/**
 	 * The size of the bullet.
@@ -72,10 +79,10 @@ public abstract class Bullet extends GameObject {
 	
 	@Override
 	public RenderProxy render() {
-		return new RenderProxy(textureRegion, body.getPosition(), size, body.getAngle());
+		return new TextureRenderProxy(textureRegion, body.getPosition(), size, body.getAngle());
 	}
 	
 	@Override
-	protected void die() {
+	protected void die(Bullet bullet) {
 	}
 }

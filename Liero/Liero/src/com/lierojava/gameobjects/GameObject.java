@@ -1,5 +1,6 @@
 package com.lierojava.gameobjects;
 
+import com.lierojava.bullets.Bullet;
 import com.lierojava.net.RenderProxy;
 
 public abstract class GameObject {
@@ -17,17 +18,18 @@ public abstract class GameObject {
 	
 	/**
 	 * Deal damage to the game object.
-	 * @param damage The amount of damage to deal.
+	 * @param bullet The bullet that deals damage.
 	 */
-	public void damage(int damage) {
-		health -= damage;
+	public void damage(Bullet bullet) {
+		health -= Math.max(0, bullet.health);
 		if (health <= 0) {
-			die();
+			die(bullet);
 		}
 	}
 	
 	/**
 	 * Handles the death of the game object.
+	 * @param bullet The bullet by which you were killed.
 	 */
-	protected abstract void die();
+	protected abstract void die(Bullet bullet);
 }

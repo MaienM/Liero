@@ -48,4 +48,23 @@ public class Utils {
 		}
 		return contacts;
 	}
+	
+	/**
+	 * Get the bodies that are in contact with a body.
+	 * 
+	 * @param b The body.
+	 * @return A list of all the bodies that are in contact with this body.
+	 */
+	public static Array<Body> getContactBodies(Body b) {
+		Array<Body> bodies = new Array<Body>();
+		for (Contact c : Utils.getContacts(b)) {
+			if (c.getFixtureA().getBody() == b) {
+				bodies.add(c.getFixtureB().getBody());
+			}
+			else {
+				bodies.add(c.getFixtureA().getBody());
+			}
+		}
+		return bodies;
+	}
 }

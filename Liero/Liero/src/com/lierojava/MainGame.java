@@ -1,6 +1,8 @@
 package com.lierojava;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -8,26 +10,25 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.lierojava.bullets.Bullet;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.HUD;
 import com.lierojava.net.RenderProxy;
-import com.lierojava.net.interfaces.IHostParticipant;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
 import com.lierojava.userdata.PendingAction;
@@ -42,7 +43,7 @@ public class MainGame implements Screen {
 	/**
 	 * The stats.
 	 */
-	public Stats stats;
+	public HashMap<Integer, PlayerData> stats = new HashMap<Integer, PlayerData>();
 	
 	/**
 	 * Debug crap.
@@ -88,11 +89,16 @@ public class MainGame implements Screen {
 	 * The IParticipantHost object, for communication to the host.
 	 */
 	public IParticipantHost iph;
+
+	/**
+	 * Whether we want the score window to be visible.
+	 */
+	private boolean showScore;
 	
 	/**
-	 * The IHostParticipant objects, for communications from the host.
+	 * How much time is remaining before the round ends.
 	 */
-	public ArrayList<IHostParticipant> ihps = new ArrayList<IHostParticipant>();
+	public float timeRemaining = 10;
 	
 	/**
 	 * Create a new game.
@@ -113,98 +119,37 @@ public class MainGame implements Screen {
 	 */	
 	@Override
 	public void render(float delta) {
-		// Clear the screen.
-		Gdx.gl.glClearColor(0, 0, 0, 0);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-
-		// Recalculate camera properties.
-        camera.update();
-        
-        // Set the rendering offset.
-        batch.setProjectionMatrix(camera.combined);
-		
-		// Begin rendering.
-		batch.begin();
-		
-		// Draw the background.
-		batch.draw(backgroundTexture, -Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		
-		// Render game objects.
-		for (RenderProxy rp : renderProxies) {
-			rp.render(batch);
-		}
-		
-		// Finish rendering.
-		batch.end();	
-
-		// Draw the debug view.
-		debugRenderer.render(world, camera.combined);
-		
-		// Perform a game step.
-		if (isHost) {
-			update();
-		} 
-		else {
-			ArrayList<RenderProxy> newRenderProxies = iph.getRenderProxies();
-			if (newRenderProxies != null) {
-				renderProxies = newRenderProxies;
-			}
-		}
-		
-		// Handle input.
-		handleInput();
-	}
-
-	/**
-	 * Peform a game step.
-	 */
-	private synchronized void update() {
-		// Perform a physics step.
-		world.step(1f/30f, 8, 3);
-		
-		// Perform pending actions.
-		executeActions();
-		
-		// Remove unwanted objects.
-		removeBodies();
-		
-		// Update the list of render proxies.
-		synchronized (renderProxies) {
-			Array<Body> bodies = new Array<Body>();
-			world.getBodies(bodies);
-			renderProxies.clear();
-			for (Body b : bodies) {
-				if (b.getUserData() instanceof GameObject) {
-					RenderProxy rp = ((GameObject)b.getUserData()).render();
-					if (rp != null) {
-						renderProxies.add(rp);
-					} else if (!(b.getUserData() instanceof StaticBarrier)) {
-						Utils.print("Null");
-					}
-				}
-				else if (b.getUserData() instanceof SimpleUserData) {
-					Utils.print("Marked for removal");
-				}
-				else if (b.getUserData() instanceof PendingAction) {
-					Utils.print("Pending action");
-				}
-				else {
-					Utils.print("HELP!");
+		if (timeRemaining > 0) {
+			// Handle input.
+			handleInput();
+					
+			// Perform a game step.
+			if (isHost) {
+				update();
+			} 
+			else {
+				ArrayList<RenderProxy> newRenderProxies = iph.getRenderProxies();
+				if (newRenderProxies != null) {
+					renderProxies = newRenderProxies;
 				}
 			}
-			renderProxies.addAll(hud.render());
+			
+			// Render. 
+			render();
 		}
-		
-		// Push the update to all clients.
-		/*for (IHostParticipant ihp : ihps) {
-			ihp.updateWorld(world);
-		}*/
+		else if (timeRemaining > -10) {
+			showScore = true;
+			render();
+		}
 	}
 	
 	/**
 	 * Process user input.
 	 */
 	private void handleInput() {
+		// Score display.
+		showScore = Gdx.input.isKeyPressed(Keys.TAB);
+		
 		if (iph == null) {
 			return;
 		}
@@ -260,6 +205,122 @@ public class MainGame implements Screen {
 			iph.fire();
 		}
 	}
+
+	/**
+	 * Peform a game step.
+	 */
+	private void update() {
+		// Update the time remaining.
+		timeRemaining -= Gdx.graphics.getDeltaTime();
+		
+		// Perform a physics step.
+		world.step(1f/30f, 8, 3);
+		
+		// Perform pending actions.
+		executeActions();
+		
+		// Remove unwanted objects.
+		removeBodies();
+		
+		// Update the list of render proxies.
+		synchronized (renderProxies) {
+			Array<Body> bodies = new Array<Body>();
+			world.getBodies(bodies);
+			renderProxies.clear();
+			for (Body b : bodies) {
+				if (b.getUserData() instanceof GameObject) {
+					RenderProxy rp = ((GameObject)b.getUserData()).render();
+					if (rp != null) {
+						renderProxies.add(rp);
+					} else if (!(b.getUserData() instanceof StaticBarrier)) {
+						Utils.print("Null");
+					}
+				}
+				else if (b.getUserData() instanceof SimpleUserData) {
+					Utils.print("Marked for removal");
+				}
+				else if (b.getUserData() instanceof PendingAction) {
+					Utils.print("Pending action");
+				}
+				else {
+					Utils.print("HELP!");
+				}
+			}
+			renderProxies.addAll(hud.render());
+		}
+	}
+
+	/**
+	 * Render the game.
+	 */
+	private void render() {
+		// Clear the screen.
+		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+
+		// Recalculate camera properties.
+        camera.update();
+        
+        // Set the rendering offset.
+        batch.setProjectionMatrix(camera.combined);
+		
+		// Begin rendering.
+		batch.begin();
+		
+		// Draw the background.
+		batch.draw(backgroundTexture, -Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		// Render game objects.
+		for (RenderProxy rp : renderProxies) {
+			rp.render(batch);
+		}
+		
+		// Render the score view.
+		if (showScore) {
+			renderScore(batch);
+		}
+		
+		// Finish rendering.
+		batch.end();	
+
+		// Draw the debug view.
+		//debugRenderer.render(world, camera.combined);
+	}
+
+	/**
+	 * Render the score.
+	 * @param batch The spritebatch to use for rendering
+	 */
+	private void renderScore(SpriteBatch batch) {
+		// Get the textures.		
+		TextureRegion bg = Constants.TEXTURES.findRegion("background_score");
+		TextureRegion even = Constants.TEXTURES.findRegion("background_score_even");
+		TextureRegion odd = Constants.TEXTURES.findRegion("background_score_odd");
+		
+		// Get the fonts.
+		BitmapFont font = new BitmapFont();
+		
+		// Get width and height.
+		int width = Gdx.graphics.getWidth();
+		int height = Gdx.graphics.getHeight();
+		
+		// Draw background and title.
+		batch.draw(bg, width * -0.4f, height * -0.4f, width * 0.8f, height * 0.8f);
+		font.draw(batch, "Player", width * -0.4f + 20, height * 0.4f - 20);
+		font.draw(batch, "Kills", width * 0.2f, height * 0.4f - 20);
+		font.draw(batch, "Deaths", width * 0.3f, height * 0.4f - 20);
+		
+		// Draw the scores.
+		int i = 0;
+		for (Entry<Integer, PlayerData> entry : stats.entrySet()) {
+			batch.draw(i % 2 == 0 ? even : odd, width * -0.4f + 16, height * 0.4f - 56 - 20 * i, width * 0.8f - 32, 20);
+			font.draw(batch, entry.getValue().name, width * -0.4f + 20, height * 0.4f - 40 - 20 * i);
+			font.draw(batch, entry.getValue().kills + "", width * 0.2f, height * 0.4f - 40 - 20 * i);
+			font.draw(batch, entry.getValue().deaths + "", width * 0.3f, height * 0.4f - 40 - 20 * i);
+			
+			i++;
+		}
+	}					
 
 	@Override
 	public void show() {
@@ -339,11 +400,11 @@ public class MainGame implements Screen {
 		
 		// Let the bullets do damage.
 		if (bodyA.isBullet()) {
-			objB.damage(Math.max(0, objA.health));
+			objB.damage((Bullet)objA);
 			bodyA.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 		}
 		if (bodyB.isBullet()) {
-			objA.damage(Math.max(0, objB.health));
+			objA.damage((Bullet)objB);
 			bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 		}
 	}	
@@ -386,26 +447,7 @@ public class MainGame implements Screen {
 	public void fillWorld(World world){
 		for (int i = 0; i < Gdx.graphics.getWidth(); i = i + Constants.GROUND_SIZE) {
 			for (int j = 0; j < Gdx.graphics.getHeight(); j = j + Constants.GROUND_SIZE) {
-				BodyDef bodyDef = new BodyDef();
-				bodyDef.type = BodyType.StaticBody;
-				bodyDef.fixedRotation = true;
-				bodyDef.position.x = i + Utils.getCameraOffset().x;
-				
-				bodyDef.position.y = j + Utils.getCameraOffset().y;
-				
-				Body body = GlobalState.currentGame.world.createBody(bodyDef);
-				Ground currGround = new Ground(body);
-				body.setUserData(currGround);
-						
-				// Create the shape.
-				PolygonShape box = new PolygonShape();
-				box.setAsBox(Constants.GROUND_SIZE, Constants.GROUND_SIZE);
-				
-				// Create the fixture.
-				body.createFixture(box, 0f);
-				
-				// Cleanup.
-				box.dispose();
+				new Ground(new Vector2(i + Utils.getCameraOffset().x, j + Utils.getCameraOffset().y));
 			}
 		}
 	}

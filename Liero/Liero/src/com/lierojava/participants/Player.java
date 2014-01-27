@@ -15,11 +15,14 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 import com.lierojava.Constants;
 import com.lierojava.GlobalState;
+import com.lierojava.PlayerData;
 import com.lierojava.Utils;
+import com.lierojava.bullets.Bullet;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.net.RenderProxy;
+import com.lierojava.net.TextureRenderProxy;
 import com.lierojava.userdata.PendingAction;
 import com.lierojava.userdata.SimpleUserData;
 import com.lierojava.weapons.Grenade;
@@ -29,6 +32,11 @@ import com.lierojava.weapons.Shotgun;
 import com.lierojava.weapons.Weapon;
 
 public class Player extends GameObject {
+	/**
+	 * The player ID.
+	 */
+	private int playerID;
+	
 	/**
 	 * The Box2D body for the player. 
 	 * 
@@ -62,6 +70,11 @@ public class Player extends GameObject {
 	private Jetpack jetpack = new Jetpack(this);
 	
 	/**
+	 * The player's stats.
+	 */
+	public PlayerData stats = new PlayerData();
+	
+	/**
 	 * The playerstate enum. 
 	 */
 	public enum PlayerState {
@@ -86,29 +99,20 @@ public class Player extends GameObject {
 	 */
 	public Thread showWeaponThread;
 	
-	public Player() {
-		this(new Vector2(0, 0));
-		spawn();
+	public Player(int playerID) {
+		this.playerID = playerID;
 		
+		// Set the weapons.
 		weapons = new ArrayList<Weapon>();
 		weapons.add(new Pistol(this));
 		weapons.add(new Shotgun(this));
 		weapons.add(new Grenade(this));
 
 		currentWeapon = weapons.get(0);
-	}
 	
-	/**
-	 * Create a new player.
-	 * 
-	 * @param world The world the player is in.
-	 * @param postion The start position of the player.
-	 */
-	public Player(Vector2 postion) {		
 		// Create the body.
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
-		bodyDef.position.set(postion);
 		bodyDef.fixedRotation = true;
 		body = GlobalState.currentGame.world.createBody(bodyDef);
 		body.setUserData(this);
@@ -127,6 +131,9 @@ public class Player extends GameObject {
 		
 		// Cleanup.
 		box.dispose();
+		
+		// Spawn.
+		spawn();
 	}
 
 	/**
@@ -135,7 +142,7 @@ public class Player extends GameObject {
 	 */
 	@SuppressWarnings("incomplete-switch")
 	public RenderProxy render() {
-		RenderProxy rp = new RenderProxy();
+		TextureRenderProxy rp = new TextureRenderProxy();
 		
 		// Determine current texture.
 		animationStateTime += Gdx.graphics.getDeltaTime();
@@ -209,28 +216,19 @@ public class Player extends GameObject {
 	 */
 	public void jump() {
 		boolean isTouchingGround = false;
-		for (Contact c : Utils.getContacts(body)) {
-			//Checks if we are standing on ground
-			//When stading on ground we assume it is below the player position
-			// TODO: Implement something actually useable
-			if (c.getFixtureA().getBody().getUserData() instanceof Ground || c.getFixtureA().getBody().getUserData() instanceof StaticBarrier) {
-				if (c.getFixtureA().getBody().getPosition().y < this.body.getPosition().y  &&
-						c.getFixtureA().getBody().getPosition().x < this.body.getPosition().x - 2 && 
-						c.getFixtureA().getBody().getPosition().x < this.body.getPosition().x + 22) {
+		for (Body b : Utils.getContactBodies(body)) {
+			// For each of our contact objects, check if it is a ground or staticbarrier object, and if it is below us.
+			Object ud = b.getUserData();
+			if (ud instanceof Ground || ud instanceof StaticBarrier) {
+				Vector2 diff = new Vector2(b.getPosition());
+				diff.sub(body.getPosition());
+				if (diff.y < 0 && Math.abs(diff.y) > Math.abs(diff.x)) {
 					isTouchingGround = true;
-					break;	
-				}
-			} else if (c.getFixtureB().getBody().getUserData() instanceof Ground || c.getFixtureB().getBody().getUserData() instanceof StaticBarrier) {
-				if (c.getFixtureB().getBody().getPosition().y < this.body.getPosition().y &&
-						c.getFixtureB().getBody().getPosition().x - 2 < this.body.getPosition().x && 
-						c.getFixtureB().getBody().getPosition().x < this.body.getPosition().x + 22) {
-					isTouchingGround = true;
-					break;	
+					break;
 				}
 			}
-			
 		}
-		
+			
 		if (isTouchingGround) {
 			float xSpeed = body.getLinearVelocity().x;
 			body.setLinearVelocity(new Vector2(xSpeed, Constants.PLAYER_JUMP_SPEED));
@@ -278,11 +276,12 @@ public class Player extends GameObject {
 		return body;
 	}
 		
-	/**
-	 * TODO: Implement.
-	 */
 	@Override
-	protected void die() {
+	protected void die(Bullet bullet) {
+		if (this != bullet.player) {
+			bullet.player.stats.kills++;
+		}
+		this.stats.deaths++;
 		spawn();
 	}
 	

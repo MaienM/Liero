@@ -29,28 +29,21 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
-import com.esotericsoftware.kryonet.rmi.RemoteObject;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.bullets.PistolBullet;
 import com.lierojava.enums.GameState;
 import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.HUD;
-import com.lierojava.net.handles.HostParticipant;
 import com.lierojava.net.handles.HostServer;
 import com.lierojava.net.handles.ParticipantHost;
 import com.lierojava.net.handles.ParticipantServer;
-import com.lierojava.net.handles.ServerHost;
-import com.lierojava.net.handles.ServerParticipant;
 import com.lierojava.net.handshake.HostHandshake;
 import com.lierojava.net.handshake.ServerHandshake;
 import com.lierojava.net.interfaces.IHostHandshake;
-import com.lierojava.net.interfaces.IHostParticipant;
 import com.lierojava.net.interfaces.IHostServer;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.net.interfaces.IServerHandshake;
-import com.lierojava.net.interfaces.IServerHost;
-import com.lierojava.net.interfaces.IServerParticipant;
 import com.lierojava.participants.Participant;
 import com.lierojava.participants.Player;
 import com.lierojava.participants.Spectator;
@@ -63,19 +56,13 @@ public class Liero extends Game implements ApplicationListener {
 	private final static Class<?>[] classes = new Class<?>[] {
 		IParticipantHost.class,
 		IParticipantServer.class,
-		IHostParticipant.class,
 		IHostServer.class,
-		IServerHost.class,
-		IServerParticipant.class,
 		IHostHandshake.class,
 		IServerHandshake.class,
 		
 		ParticipantHost.class,
 		ParticipantServer.class,
-		HostParticipant.class,
 		HostServer.class,
-		ServerHost.class,
-		ServerParticipant.class,
 		HostHandshake.class,
 		ServerHandshake.class,
 
@@ -84,7 +71,7 @@ public class Liero extends Game implements ApplicationListener {
 		Player.PlayerState.class,
 		Spectator.class,
 		Chatroom.class,
-		Stats.class,
+		PlayerData.class,
 		GameState.class,
 		StaticBarrier.class,
 		SimpleUserData.class,
@@ -172,7 +159,6 @@ public class Liero extends Game implements ApplicationListener {
 			try {
 				startServer();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				host = "127.0.0.1";
 			}
@@ -211,7 +197,7 @@ public class Liero extends Game implements ApplicationListener {
 		IHostHandshake ihh = new HostHandshake();
 		GlobalState.objectSpace.register(0, ihh);
 		
-		ihh.requestParticipant(true);
+		ihh.requestParticipant(true, 0);
 		game.iph = new ParticipantHost(game.players.get(0));
 	}
 	
@@ -229,17 +215,9 @@ public class Liero extends Game implements ApplicationListener {
 		client.setTimeout(0);
 
 		IHostHandshake ihh = ObjectSpace.getRemoteObject(client, 0, IHostHandshake.class);
-		int index = ihh.requestParticipant(true);
+		int index = ihh.requestParticipant(true, 1);
 		if (index > 0) {
 			game.iph = ObjectSpace.getRemoteObject(client, index, IParticipantHost.class);
-			RemoteObject ro = (RemoteObject)game.iph;
-			ro.setNonBlocking(true);
-			
-			IHostParticipant ihp = new HostParticipant();
-			GlobalState.objectSpace.register(++GlobalState.objectSpaceIndex, ihp);
-			game.iph.register(GlobalState.objectSpaceIndex);
-			
-			ro.setNonBlocking(false);
 		}
 	}
 	
