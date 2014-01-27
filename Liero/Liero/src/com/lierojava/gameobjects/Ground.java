@@ -1,5 +1,7 @@
 package com.lierojava.gameobjects;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -47,8 +49,10 @@ public class Ground extends GameObject {
 	}
 
 	@Override
-	public RenderProxy render() {
-		return new TextureRenderProxy("ground", body.getPosition(), new Vector2(Constants.GROUND_SIZE, Constants.GROUND_SIZE));
+	public ArrayList<RenderProxy> render() {
+		return new ArrayList<RenderProxy>() {{
+			add(new TextureRenderProxy("ground", body.getPosition(), new Vector2(Constants.GROUND_SIZE, Constants.GROUND_SIZE)));
+		}};
 	}
 
 	@Override

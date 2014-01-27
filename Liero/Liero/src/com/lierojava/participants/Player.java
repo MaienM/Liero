@@ -141,8 +141,8 @@ public class Player extends GameObject {
 	 * @return 
 	 */
 	@SuppressWarnings("incomplete-switch")
-	public RenderProxy render() {
-		TextureRenderProxy rp = new TextureRenderProxy();
+	public ArrayList<RenderProxy> render() {
+		final TextureRenderProxy rp = new TextureRenderProxy();
 		
 		// Determine current texture.
 		animationStateTime += Gdx.graphics.getDeltaTime();
@@ -170,7 +170,9 @@ public class Player extends GameObject {
 		rp.size = new Vector2(texture.getRegionWidth() * Constants.PLAYER_TEXTURE_SCALE, texture.getRegionHeight() * Constants.PLAYER_TEXTURE_SCALE);
 		rp.position.x -= texture.getRegionWidth();
 		rp.position.y -= texture.getRegionHeight();
-		return rp;
+		return new ArrayList<RenderProxy>() {{
+			add(rp);
+		}};
 	}
 
 	/**

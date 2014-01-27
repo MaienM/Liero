@@ -16,7 +16,7 @@ public class GrenadeBullet extends Bullet {
 	public void setup(Vector2 start, final float angle) {
 		// Throw grenade.
 		spawnBullet(start, angle);
-		body.setBullet(false);
+		bodies.get(0).setBullet(false);
 		textureRegion = "bullet";
 		
 		new Thread(new Runnable() {
@@ -27,8 +27,8 @@ public class GrenadeBullet extends Bullet {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				Vector2 start = body.getPosition();
-				body.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+				Vector2 start = bodies.get(0).getPosition();
+				bodies.get(0).setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 				Gdx.audio.newSound(Gdx.files.internal("sounds/grenadeExplosion.mp3")).play();
 				size = new Vector2(1, 1);
 				speed = 1f;

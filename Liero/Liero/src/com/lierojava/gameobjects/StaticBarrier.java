@@ -1,5 +1,7 @@
 package com.lierojava.gameobjects;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -86,7 +88,7 @@ public class StaticBarrier extends GameObject {
 
 
 	@Override
-	public RenderProxy render() {
+	public ArrayList<RenderProxy> render() {
 		return null;
 		// TODO Auto-generated method stub
 	}

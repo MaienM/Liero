@@ -49,6 +49,7 @@ public class MainGame implements Screen {
 	 * Debug crap.
 	 */
 	private Box2DDebugRenderer debugRenderer;
+	private boolean debug;
 	
 	/**
 	 * The viewport camera.
@@ -98,8 +99,15 @@ public class MainGame implements Screen {
 	/**
 	 * How much time is remaining before the round ends.
 	 */
-	public float timeRemaining = 10;
+	public float timeRemaining = 300;
 	
+	/**
+	 * The key handlers.
+	 */
+	private KeyHandler nextWeaponKey = new KeyHandler(1f, Keys.PAGE_UP);
+	private KeyHandler prevWeaponKey = new KeyHandler(1f, Keys.PAGE_DOWN);
+	private KeyHandler toggleDebugKey = new KeyHandler(1f, Keys.F12);
+
 	/**
 	 * Create a new game.
 	 */
@@ -176,10 +184,10 @@ public class MainGame implements Screen {
 		}
 		
 		// Weapon switching.
-		if (Gdx.input.isKeyPressed(Keys.PAGE_UP)) {
+		if (nextWeaponKey.isPressed()) {
 			iph.setWeaponIndex((iph.getWeaponIndex() + 1) % Constants.MAX_WEAPONS);
 		}
-		if (Gdx.input.isKeyPressed(Keys.PAGE_DOWN)) {
+		if (prevWeaponKey.isPressed()) {
 			iph.setWeaponIndex((Constants.MAX_WEAPONS + iph.getWeaponIndex() - 1) % Constants.MAX_WEAPONS);
 		}
 		if (Gdx.input.isKeyPressed(Keys.NUM_1)) {
@@ -203,6 +211,16 @@ public class MainGame implements Screen {
 		// Weapon firing.
 		if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.ENTER)) {
 			iph.fire();
+		}
+		
+		// Toggle the debug renderer.
+		if (toggleDebugKey.isPressed()) {
+			debug = !debug;
+		}
+		
+		// TODO: Remove in final version
+		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+			Gdx.app.exit();
 		}
 	}
 
@@ -229,9 +247,9 @@ public class MainGame implements Screen {
 			renderProxies.clear();
 			for (Body b : bodies) {
 				if (b.getUserData() instanceof GameObject) {
-					RenderProxy rp = ((GameObject)b.getUserData()).render();
+					ArrayList<RenderProxy> rp = ((GameObject)b.getUserData()).render();
 					if (rp != null) {
-						renderProxies.add(rp);
+						renderProxies.addAll(rp);
 					} else if (!(b.getUserData() instanceof StaticBarrier)) {
 						Utils.print("Null");
 					}
@@ -284,7 +302,9 @@ public class MainGame implements Screen {
 		batch.end();	
 
 		// Draw the debug view.
-		//debugRenderer.render(world, camera.combined);
+		if (debug) {
+			debugRenderer.render(world, camera.combined);
+		}
 	}
 
 	/**

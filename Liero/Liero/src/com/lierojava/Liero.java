@@ -189,7 +189,7 @@ public class Liero extends Game implements ApplicationListener {
              }
 
              public void received(Connection connection, Object object) {
-            	 Utils.print("Received data: " + object);
+            	 //Utils.print("Received data: " + object);
             	 GlobalState.lastSender = connection;
              }
          });

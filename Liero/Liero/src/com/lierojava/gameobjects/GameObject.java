@@ -1,5 +1,7 @@
 package com.lierojava.gameobjects;
 
+import java.util.ArrayList;
+
 import com.lierojava.bullets.Bullet;
 import com.lierojava.net.RenderProxy;
 
@@ -14,7 +16,7 @@ public abstract class GameObject {
 	 * 
 	 * @return The renderproxy.
 	 */
-	public abstract RenderProxy render();
+	public abstract ArrayList<RenderProxy> render();
 	
 	/**
 	 * Deal damage to the game object.

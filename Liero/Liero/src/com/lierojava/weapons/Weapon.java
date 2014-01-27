@@ -121,6 +121,7 @@ public abstract class Weapon {
 				return;
 			}
 			bullet.setup(player.getBody().getPosition().add(Utils.angleToVector(angle).scl(Constants.WEAPON_OFFSET)), angle);
+			bullet.player = player;
 		}
 		
 		// Apply knockback.

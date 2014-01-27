@@ -1,5 +1,7 @@
 package com.lierojava.bullets;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -17,7 +19,7 @@ public abstract class Bullet extends GameObject {
 	/**
 	 * The body of this bullet.
 	 */
-	protected Body body;
+	protected ArrayList<Body> bodies = new ArrayList<Body>();
 	
 	/**
 	 * The player that fired this bullet.
@@ -58,8 +60,9 @@ public abstract class Bullet extends GameObject {
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(start);
 		bodyDef.bullet = true;
-		body = GlobalState.currentGame.world.createBody(bodyDef);
+		Body body = GlobalState.currentGame.world.createBody(bodyDef);
 		body.setUserData(this);
+		bodies.add(body);
 
 		// Create the bullet shape.
 		PolygonShape box = new PolygonShape();
@@ -78,8 +81,12 @@ public abstract class Bullet extends GameObject {
 	}
 	
 	@Override
-	public RenderProxy render() {
-		return new TextureRenderProxy(textureRegion, body.getPosition(), size, body.getAngle());
+	public ArrayList<RenderProxy> render() {
+		ArrayList<RenderProxy> proxies = new ArrayList<RenderProxy>();
+		for (Body b : bodies) {
+			proxies.add(new TextureRenderProxy(textureRegion, b.getPosition(), new Vector2(size).scl(3), b.getAngle()));
+		}
+		return proxies;
 	}
 	
 	@Override
