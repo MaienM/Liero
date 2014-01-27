@@ -10,6 +10,16 @@ public final class Constants {
 	public static final int PORT = 29992;
 	
 	/**
+	 * The port the main/master server runs on
+	 */
+	public static final int SERVER_PORT = 34534;
+	
+	/**
+	 * The host where the master server is located
+	 */
+	public static final String SERVER_HOST = "127.0.0.1";
+	
+	/**
 	 * Conversion from screen units to Box2D units.
 	 */
 	public static final float WORLD_TO_BOX = 0.01f;
