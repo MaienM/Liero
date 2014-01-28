@@ -3,9 +3,9 @@ package com.lierojava.weapons;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.lierojava.Constants;
-import com.lierojava.GlobalState;
 import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
+import com.lierojava.client.GlobalState;
 import com.lierojava.participants.Player;
 
 public abstract class Weapon {

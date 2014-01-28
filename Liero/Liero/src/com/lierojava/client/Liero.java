@@ -1,4 +1,4 @@
-package com.lierojava;
+package com.lierojava.client;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +29,10 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import com.lierojava.Chatroom;
+import com.lierojava.Constants;
+import com.lierojava.PlayerData;
+import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.bullets.PistolBullet;
 import com.lierojava.enums.GameState;

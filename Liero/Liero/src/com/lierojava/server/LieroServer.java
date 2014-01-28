@@ -36,6 +36,7 @@ public class LieroServer {
     Dao<Account, Integer> accDao;
     
     private boolean isHost = false;
+    
     /**
      * Server constructor, tries to connect to the database
      */

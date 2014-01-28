@@ -3,7 +3,7 @@ package com.lierojava.net.handles;
 import java.util.ArrayList;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.lierojava.GlobalState;
+import com.lierojava.client.GlobalState;
 import com.lierojava.net.RenderProxy;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;

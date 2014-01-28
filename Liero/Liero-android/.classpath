@@ -9,6 +9,7 @@
     <classpathentry kind="output" path="bin/classes"/>
     <classpathentry exported="true" kind="lib" path="libs/gdx-backend-android.jar" sourcepath="libs/gdx-backend-android-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="/Liero/libs/bodyeditor-loader.jar" sourcepath="/Liero/libs/bodyeditor-loader-sources.jar"/>
+    <classpathentry kind="lib" path="/Liero/libs/gdx-freetype.jar"/>
     <classpathentry exported="true" kind="lib" path="/Liero/libs/gdx.jar" sourcepath="/Liero/libs/gdx-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="/Liero/libs/tween-engine-api.jar" sourcepath="/Liero/libs/tween-engine-api-sources.jar"/>
 </classpath>

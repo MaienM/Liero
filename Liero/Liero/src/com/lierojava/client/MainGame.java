@@ -1,6 +1,7 @@
-package com.lierojava;
+package com.lierojava.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -23,6 +24,9 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.lierojava.Constants;
+import com.lierojava.PlayerData;
+import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
@@ -242,29 +246,13 @@ public class MainGame implements Screen {
 		
 		// Update the list of render proxies.
 		synchronized (renderProxies) {
-			Array<Body> bodies = new Array<Body>();
-			world.getBodies(bodies);
 			renderProxies.clear();
-			for (Body b : bodies) {
-				if (b.getUserData() instanceof GameObject) {
-					ArrayList<RenderProxy> rp = ((GameObject)b.getUserData()).render();
-					if (rp != null) {
-						renderProxies.addAll(rp);
-					} else if (!(b.getUserData() instanceof StaticBarrier)) {
-						Utils.print("Null");
-					}
-				}
-				else if (b.getUserData() instanceof SimpleUserData) {
-					Utils.print("Marked for removal");
-				}
-				else if (b.getUserData() instanceof PendingAction) {
-					Utils.print("Pending action");
-				}
-				else {
-					Utils.print("HELP!");
-				}
+			for (GameObject obj : Utils.getGameObjects()) {
+				ArrayList<RenderProxy> rp = obj.render();
+				renderProxies.addAll(rp);
 			}
 			renderProxies.addAll(hud.render());
+			Collections.sort(renderProxies);
 		}
 	}
 
@@ -318,7 +306,8 @@ public class MainGame implements Screen {
 		TextureRegion odd = Constants.TEXTURES.findRegion("background_score_odd");
 		
 		// Get the fonts.
-		BitmapFont font = new BitmapFont();
+		BitmapFont headerFont = Constants.FONTS.get("SCORE_HEADER");
+		BitmapFont dataFont = Constants.FONTS.get("SCORE_DATA");
 		
 		// Get width and height.
 		int width = Gdx.graphics.getWidth();
@@ -326,17 +315,17 @@ public class MainGame implements Screen {
 		
 		// Draw background and title.
 		batch.draw(bg, width * -0.4f, height * -0.4f, width * 0.8f, height * 0.8f);
-		font.draw(batch, "Player", width * -0.4f + 20, height * 0.4f - 20);
-		font.draw(batch, "Kills", width * 0.2f, height * 0.4f - 20);
-		font.draw(batch, "Deaths", width * 0.3f, height * 0.4f - 20);
+		headerFont.draw(batch, "Player", width * -0.4f + 20, height * 0.4f - 20);
+		headerFont.draw(batch, "Kills", width * 0.2f, height * 0.4f - 20);
+		headerFont.draw(batch, "Deaths", width * 0.3f, height * 0.4f - 20);
 		
 		// Draw the scores.
 		int i = 0;
 		for (Entry<Integer, PlayerData> entry : stats.entrySet()) {
-			batch.draw(i % 2 == 0 ? even : odd, width * -0.4f + 16, height * 0.4f - 56 - 20 * i, width * 0.8f - 32, 20);
-			font.draw(batch, entry.getValue().name, width * -0.4f + 20, height * 0.4f - 40 - 20 * i);
-			font.draw(batch, entry.getValue().kills + "", width * 0.2f, height * 0.4f - 40 - 20 * i);
-			font.draw(batch, entry.getValue().deaths + "", width * 0.3f, height * 0.4f - 40 - 20 * i);
+			batch.draw(i % 2 == 0 ? even : odd, width * -0.4f + 16, height * 0.4f - 60 - 20 * i, width * 0.8f - 32, 20);
+			dataFont.draw(batch, entry.getValue().name, width * -0.4f + 20, height * 0.4f - 44 - 20 * i);
+			dataFont.draw(batch, entry.getValue().kills + "", width * 0.2f, height * 0.4f - 44 - 20 * i);
+			dataFont.draw(batch, entry.getValue().deaths + "", width * 0.3f, height * 0.4f - 44 - 20 * i);
 			
 			i++;
 		}

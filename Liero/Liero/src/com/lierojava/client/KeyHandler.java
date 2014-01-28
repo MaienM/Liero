@@ -1,4 +1,4 @@
-package com.lierojava;
+package com.lierojava.client;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.TimeUtils;

@@ -36,6 +36,16 @@ public class TextureRenderProxy extends RenderProxy {
 	 */
 	public boolean flipY;
 	
+	/**
+	 * Whether to center the texture on the position.
+	 */
+	public boolean center;
+	
+	/**
+	 * Whether to draw the texture as repeating (as opposed to stretching it).
+	 */
+	public boolean repeat;
+	
 	public TextureRenderProxy() {
 		this("", Vector2.Zero, Vector2.Zero);
 	}
@@ -49,18 +59,41 @@ public class TextureRenderProxy extends RenderProxy {
 		this(textureRegion, position, size, angle, false, false);
 	}
 	public TextureRenderProxy(String textureRegion, Vector2 position, Vector2 size, float angle, boolean flipX, boolean flipY) {
+		this(textureRegion, position, size, angle, flipX, flipY, false);
+	}
+	public TextureRenderProxy(String textureRegion, Vector2 position, Vector2 size, float angle, boolean flipX, boolean flipY, boolean center) {
+		this(textureRegion, position, size, angle, flipX, flipY, center, false);
+	}
+	public TextureRenderProxy(String textureRegion, Vector2 position, Vector2 size, float angle, boolean flipX, boolean flipY, boolean center, boolean repeat) {
 		this.textureRegion = textureRegion;
 		this.position = position;
 		this.size = size;
 		this.angle = angle;
 		this.flipX = flipX;
 		this.flipY = flipY;
+		this.center = center;
+		this.repeat = repeat;
 	}
 	
 	@Override
 	public void render(SpriteBatch batch) {
 		TextureRegion tr = new TextureRegion(Constants.TEXTURES.findRegion(textureRegion));
 		tr.flip(flipX, flipY);
-		batch.draw(tr, position.x, position.y, 0, 0, size.x, size.y, 1, 1, angle);
+		Vector2 pos = this.position;
+		if (center) {
+			pos = new Vector2(pos);
+			pos.x -= size.x / 2;
+			pos.y -= size.y / 2;
+		}
+		if (repeat) {
+			for (int x = 0; x < size.x; x += tr.getRegionWidth()) {
+				for (int y = 0; y < size.y; y += tr.getRegionHeight()) {
+					batch.draw(tr, pos.x + x, pos.y + y, 0, 0, Math.min(tr.getRegionWidth(), size.x - x), Math.min(tr.getRegionHeight(), size.y - y), 1, 1, angle);
+				}
+			}
+		}
+		else {
+			batch.draw(tr, pos.x, pos.y, 0, 0, size.x, size.y, 1, 1, angle);
+		}
 	}
 }

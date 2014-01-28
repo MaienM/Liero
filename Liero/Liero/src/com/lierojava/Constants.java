@@ -5,6 +5,7 @@ import java.util.HashMap;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 public final class Constants {
 	/**
@@ -72,9 +73,14 @@ public final class Constants {
 	 */
 	@SuppressWarnings("serial")
 	public static HashMap<String, BitmapFont> FONTS = new HashMap<String, BitmapFont>() {{
-		BitmapFont f = new BitmapFont();
-		f.scale(2);
-		put("CLOCK", f);
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Cousine-Regular-Latin.ttf"));
+		FreeTypeFontGenerator boldGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Cousine-Bold-Latin.ttf"));
+		put("HUD_PLAYERNAME", generator.generateFont(12)); 
+		put("HUD_CLOCK", generator.generateFont(36)); 
+		put("SCORE_HEADER", boldGenerator.generateFont(16));
+		put("SCORE_DATA", generator.generateFont(16));
+		generator.dispose();
+		boldGenerator.dispose();
 	}};
 	
 	/**
