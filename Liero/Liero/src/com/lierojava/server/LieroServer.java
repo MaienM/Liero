@@ -86,8 +86,7 @@ public class LieroServer {
      * @param args
      */
 	public static void main(String[] args) {
-		LieroServer s = new LieroServer();
-		
+		new LieroServer();
 	}
 	
 	/**

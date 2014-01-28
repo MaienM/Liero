@@ -90,6 +90,7 @@ public class StaticBarrier extends GameObject {
 
 	@Override
 	public ArrayList<RenderProxy> render() {
+		@SuppressWarnings("serial")
 		ArrayList<RenderProxy> proxies = new ArrayList<RenderProxy>() {{
 			add(new TextureRenderProxy("border", new Vector2(-Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2), new Vector2(Gdx.graphics.getWidth(), Constants.BARRIER_SIZE), 0, false, false, false, true));
 			add(new TextureRenderProxy("border", new Vector2(-Gdx.graphics.getWidth() / 2 + 1, Gdx.graphics.getHeight() / 2 - Constants.BARRIER_SIZE), new Vector2(Gdx.graphics.getWidth(), Constants.BARRIER_SIZE), 0, false, false, false, true));
