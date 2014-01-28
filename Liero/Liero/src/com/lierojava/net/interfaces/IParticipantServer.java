@@ -37,4 +37,11 @@ public interface IParticipantServer {
 	 * @return String the name
 	 */
 	public String getName();
+
+	/**
+	 * Gets the index of the chat object for this player
+	 * 
+	 * @return the index of the chat object
+	 */
+	public int getChatInstance();
 }

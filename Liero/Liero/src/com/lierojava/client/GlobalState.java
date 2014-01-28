@@ -1,5 +1,7 @@
 package com.lierojava.client;
 
+import java.util.ArrayList;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import com.lierojava.enums.GameState;
@@ -29,4 +31,9 @@ public class GlobalState {
 	 * The last connection that sent us something.
 	 */
 	public static Connection lastSender;
+	
+	/**
+	 * A complete list of all sent chat messages
+	 */
+	public static ArrayList<String> chatMessages = new ArrayList<String>();
 }

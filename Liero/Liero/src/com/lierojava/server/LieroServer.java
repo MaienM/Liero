@@ -21,6 +21,7 @@ import com.lierojava.Utils;
 import com.lierojava.net.handles.ParticipantServer;
 import com.lierojava.net.handshake.ServerHandshake;
 import com.lierojava.net.interfaces.IHostServer;
+import com.lierojava.net.interfaces.IParticipantChat;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.net.interfaces.IServerHandshake;
 import com.lierojava.server.data.HostStruct;
@@ -53,11 +54,12 @@ public class LieroServer {
      * Server constructor, tries to connect to the database
      */
     public LieroServer() {
-    	
+    	//Try to start a server
 		try {
 			StartServer();
 		} catch (IOException e1) {
 			try {
+				//That failed, try to start as client then
 				StartClient();
 				isHost = false;
 			} catch (IOException e) {
@@ -67,16 +69,17 @@ public class LieroServer {
 			e1.printStackTrace();
 		}
 		
+		//Initialization below this point is Serverside only
 		if (!isHost) {
 			return;
 		}
 		
+		//Initialize database and make sure table exists
 		try {
 			connectionSource = new JdbcConnectionSource(connectionString);
 			accDao = DaoManager.createDao(connectionSource, Account.class);
 			TableUtils.createTableIfNotExists(connectionSource, Account.class);
 		} catch (SQLException e) {
-			//  TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -154,7 +157,7 @@ public class LieroServer {
 		int dbId = -1;
 		dbId = ish.login("anotherTest", "test");
 		
-		//We managed to login
+		//We managed to login, set some values
 		if (dbId != -1) {
 			//Get our interface to the server
 			GlobalServerState.ips = ObjectSpace.getRemoteObject(kryoClient, dbId, IParticipantServer.class);
@@ -163,25 +166,14 @@ public class LieroServer {
 			ident.dbId = dbId;
 			kryoClient.sendTCP(ident);
 			
-			//Create a game host, send it to the server and recieve an IHostServer interface
-			HostStruct hs = new HostStruct("127.0.0.1", 2900, "ssddaa");
-			int ihsId = GlobalServerState.ips.addGame(hs);
+			// Get the global chat handle
+			int index = GlobalServerState.ips.getChatInstance();
+			GlobalServerState.ipc = ObjectSpace.getRemoteObject(kryoClient, index, IParticipantChat.class);
 			
-			if (ihsId == -1) {
-				Utils.print("Failed to create game");
-				return;
-			}
-			IHostServer ihs = ObjectSpace.getRemoteObject(kryoClient, ihsId, IHostServer.class);
-			
-			//Check if someplayer with dbId is logged in and belongs to some host
-			Utils.print(ihs.isLoggedinPlayer(dbId, "127.0.0.1"));
-			
-			//Fetch games, print them and then increase the kills and deaths of this player by 10
-			ArrayList<HostStruct> games = GlobalServerState.ips.getGames();
-			for (HostStruct game : games) {
-				Utils.print(game.host + ":" + game.port + " > " + game.name);
-			}
-			ihs.savePlayerStats(dbId, 10, 10);
+			//-------Run test functionality---------
+			//TODO: Remove
+			//-------Run test functionality---------
+			this.testClientFunctionality(kryoClient, dbId);
 		}
 		//We failed to login
 		else  {
@@ -281,9 +273,7 @@ public class LieroServer {
 	 * Persists the stats of a player
 	 * 
 	 * @param id Database id of the player
-	 * 
 	 * @param kills The number of kills the player had this round
-	 * 
 	 * @param deaths The number of deaths the player had this round
 	 */
 	public void savePlayerStats(int id, int kills, int deaths) {
@@ -315,7 +305,6 @@ public class LieroServer {
 			Account acc = accDao.queryForId(dbId);
 			GlobalServerState.connectionAccounts.put(conn, acc);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -333,6 +322,54 @@ public class LieroServer {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Tests all required client and host functionality
+	 * @param kryoClient The client to test with
+	 * @param dbId the dbId to test with
+	 * 
+	 * TODO: remove
+	 */
+	private void testClientFunctionality(Client kryoClient, int dbId) {
+		//Create a game host, send it to the server and receive an IHostServer interface
+		HostStruct hs = new HostStruct("127.0.0.1", 2900, "ssddaa");
+		int ihsId = GlobalServerState.ips.addGame(hs);
+		
+		if (ihsId == -1) {
+			Utils.print("Failed to create game");
+			return;
+		}
+		IHostServer ihs = ObjectSpace.getRemoteObject(kryoClient, ihsId, IHostServer.class);
+		
+		//Check if someplayer with dbId is logged in and belongs to some host
+		Utils.print(ihs.isLoggedinPlayer(dbId, "127.0.0.1"));
+		
+		//Fetch games, print them and then increase the kills and deaths of this player by 10
+		ArrayList<HostStruct> games = GlobalServerState.ips.getGames();
+		for (HostStruct game : games) {
+			Utils.print(game.host + ":" + game.port + " > " + game.name);
+		}
+		ihs.savePlayerStats(dbId, 10, 10);
+		
+		// Get the Chat object
+		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message1");
+		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message2");
+		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message3");
+		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message4");
+		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message5");
+		ArrayList<String> messages = GlobalServerState.ipc.getNewMessages();
+		Utils.print("Gotmessages");
+		for (String message : messages) {
+			Utils.print(message);
+		}
+		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message6");
+		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message7");
+		messages = GlobalServerState.ipc.getNewMessages();
+		for (String message : messages) {
+			Utils.print(message);
+		}
+
 	}
 
 }

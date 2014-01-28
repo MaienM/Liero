@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.lierojava.Utils;
 import com.lierojava.net.interfaces.IHostServer;
+import com.lierojava.net.interfaces.IParticipantChat;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.server.GlobalServerState;
 import com.lierojava.server.data.HostStruct;
@@ -82,5 +83,13 @@ public class ParticipantServer implements IParticipantServer {
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	@Override
+	public int getChatInstance() {
+		IParticipantChat ipc = new ParticipantChat(true);
+		int index = (int) (this.databaseId + Math.ceil(Integer.MAX_VALUE * 0.25));
+		GlobalServerState.serverObjectSpace.register(index, ipc);
+		return index;
 	}
 }
