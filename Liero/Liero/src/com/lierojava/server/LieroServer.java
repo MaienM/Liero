@@ -265,7 +265,7 @@ public class LieroServer {
 			Account loginAccount = accounts.get(0);
 			Utils.print(loginAccount.getKills()  + "  :  " + loginAccount.getDeaths());
 			if (loginAccount.isCorrectPassword(password)) {
-				IParticipantServer ips = new ParticipantServer(loginAccount.getId());
+				IParticipantServer ips = new ParticipantServer(loginAccount.getId(), loginAccount.getName());
 				GlobalServerState.serverObjectSpace.register(loginAccount.getId(), ips);
 				return loginAccount.getId();
 			} 

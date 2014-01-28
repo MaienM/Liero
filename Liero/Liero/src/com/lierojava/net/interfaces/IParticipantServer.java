@@ -16,14 +16,25 @@ public interface IParticipantServer {
 	 * @param game
 	 * @return 
 	 */
-	int addGame(HostStruct game);
+	public int addGame(HostStruct game);
 	
 	/**
 	 * Refreshes the current game list
 	 * 
 	 * @return Array containing all current games
 	 */
-	ArrayList<HostStruct> getGames();
-	int getDatabaseId();
-
+	public ArrayList<HostStruct> getGames();
+	
+	/**
+	 * Returns the database id of the player
+	 * @return int the databaseId
+	 */
+	public int getDatabaseId();
+	
+	/**
+	 * Returns the name of the player
+	 * 
+	 * @return String the name
+	 */
+	public String getName();
 }

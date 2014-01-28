@@ -14,7 +14,15 @@ import com.lierojava.server.data.HostStruct;
  * @author Michon
  */
 public class ParticipantServer implements IParticipantServer {
+	/*
+	 * The database id of the player
+	 */
 	public int databaseId;
+	
+	/**
+	 * The name of the player
+	 */
+	public String name;
 	
 	/**
 	 * Kryonet no-arg constructor
@@ -28,8 +36,9 @@ public class ParticipantServer implements IParticipantServer {
 	 * 
 	 * @param db The database Id of the player belonging to this instance
 	 */
-	public ParticipantServer(int dbid) {
+	public ParticipantServer(int dbid, String name) {
 		this.databaseId = dbid;
+		this.name = name;
 	}
 	
 	/**
@@ -68,5 +77,10 @@ public class ParticipantServer implements IParticipantServer {
 	@Override
 	public int getDatabaseId() {
 		return this.databaseId;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
 	}
 }
