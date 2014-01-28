@@ -1,5 +1,22 @@
 package com.lierojava.client;
 
+import java.io.IOException;
+
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Game;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import com.lierojava.Constants;
+import com.lierojava.Utils;
+import com.lierojava.enums.GameState;
+import com.lierojava.net.handles.ParticipantHost;
+import com.lierojava.net.handshake.HostHandshake;
+import com.lierojava.net.interfaces.IHostHandshake;
+import com.lierojava.net.interfaces.IParticipantHost;
+
 
 
 public class Liero extends Game implements ApplicationListener {

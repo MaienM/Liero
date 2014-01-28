@@ -1,10 +1,7 @@
 package com.lierojava;
 
 import java.util.ArrayList;
-<<<<<<< HEAD
 import java.util.Locale;
-=======
->>>>>>> 363b18c6c83db40a5d1959a66838747dd233bc7b
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -20,7 +17,6 @@ import com.badlogic.gdx.physics.box2d.Transform;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.utils.Array;
-<<<<<<< HEAD
 import com.badlogic.gdx.utils.Array.ArrayIterable;
 import com.badlogic.gdx.utils.Array.ArrayIterator;
 import com.badlogic.gdx.utils.LongMap;
@@ -29,7 +25,11 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.bullets.PistolBullet;
+import com.lierojava.client.GlobalState;
+import com.lierojava.client.MainGame;
+import com.lierojava.client.MainGameContactListener;
 import com.lierojava.enums.GameState;
+import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.HUD;
 import com.lierojava.net.handles.HostServer;
@@ -49,10 +49,9 @@ import com.lierojava.userdata.SimpleUserData;
 import com.lierojava.weapons.Jetpack;
 import com.lierojava.weapons.Pistol;
 import com.lierojava.weapons.Weapon;
-=======
-import com.lierojava.client.GlobalState;
-import com.lierojava.gameobjects.GameObject;
->>>>>>> 363b18c6c83db40a5d1959a66838747dd233bc7b
+
+
+
 
 public class Utils {
 	/**

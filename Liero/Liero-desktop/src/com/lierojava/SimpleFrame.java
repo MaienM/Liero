@@ -47,6 +47,7 @@ public class SimpleFrame extends JFrame {
 		
 		JButton btnHost = new JButton("Host");
 		btnHost.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 				cfg.title = "Liero";
@@ -62,6 +63,7 @@ public class SimpleFrame extends JFrame {
 		
 		JButton btnJoin = new JButton("Join");
 		btnJoin.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (tbHost.getText().isEmpty()) {
 					return;
