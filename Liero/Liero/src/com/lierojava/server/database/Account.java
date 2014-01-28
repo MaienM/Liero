@@ -36,7 +36,7 @@ public class Account {
 	/**
 	 * The unique database id
 	 */
-	@DatabaseField(id = true)
+	@DatabaseField(generatedId = true)
 	private int id;
 	
 	/**
@@ -160,6 +160,14 @@ public class Account {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Gets the databaseId of this account
+	 * @return The id
+	 */
+	public int getId() {
+		return this.id;
 	}
 	
 }

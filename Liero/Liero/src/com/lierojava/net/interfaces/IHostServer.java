@@ -7,4 +7,8 @@ package com.lierojava.net.interfaces;
  */
 public interface IHostServer {
 
+	boolean isLoggedinPlayer(int dbId, String string);
+
+	void savePlayerStats(int dbId, int kills, int deaths);
+
 }

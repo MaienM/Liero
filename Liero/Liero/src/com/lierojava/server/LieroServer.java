@@ -2,7 +2,9 @@ package com.lierojava.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -16,6 +18,13 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.lierojava.Constants;
 import com.lierojava.Utils;
+import com.lierojava.net.handles.ParticipantServer;
+import com.lierojava.net.handshake.ServerHandshake;
+import com.lierojava.net.interfaces.IHostServer;
+import com.lierojava.net.interfaces.IParticipantServer;
+import com.lierojava.net.interfaces.IServerHandshake;
+import com.lierojava.server.data.HostStruct;
+import com.lierojava.server.data.ParticipantIdentifier;
 import com.lierojava.server.database.Account;
 
 public class LieroServer {
@@ -35,7 +44,11 @@ public class LieroServer {
      */
     Dao<Account, Integer> accDao;
     
-    private boolean isHost = false;
+    /**
+     * Boolean to determine whether we are a server or a client
+     */
+    private boolean isHost = true;
+    
     /**
      * Server constructor, tries to connect to the database
      */
@@ -74,6 +87,7 @@ public class LieroServer {
      */
 	public static void main(String[] args) {
 		LieroServer s = new LieroServer();
+		
 	}
 	
 	/**
@@ -86,19 +100,40 @@ public class LieroServer {
 		kryoServer.start();
 		kryoServer.bind(Constants.SERVER_PORT);
 		kryoServer.addListener(new Listener() {
-            public void connected(final Connection connection) {
-           	 Utils.print("Connection");
+            @Override
+			public void connected(final Connection connection) {
+           	 GlobalServerState.serverObjectSpace.addConnection(connection);
+           	 Utils.print(connection.getID());
+           	 if (connection.getRemoteAddressTCP().getAddress() == null) {
+           		 connection.close();
+           	 }
             }
 
-            public void disconnected(Connection connection) {
-           	 Utils.print("Client lost");
+            @Override
+			public void disconnected(Connection connection) {
+            	//Cleans up a connection and removes a game if the connection had any
+            	if (GlobalServerState.connectionAccounts.containsKey(connection)) {
+            		Account acc = GlobalServerState.connectionAccounts.get(connection);
+            		if (GlobalServerState.accountGame.containsKey(acc.getId())) {
+            			GlobalServerState.accountGame.remove(acc.getId());
+            		}
+            	}
+            	GlobalServerState.connectionAccounts.remove(connection);
             }
 
-            public void received(Connection connection, Object object) {
-           	 Utils.print("Received data: " + object);
+            @Override
+			public void received(Connection connection, Object object) {
+            	//ParticipantIdentifier is a class solely made to attach a connection to a player
+            	if (object instanceof ParticipantIdentifier) {
+            		GlobalServerState.server.addAccountToList(connection, ((ParticipantIdentifier) object).dbId);
+            	}
             }
         });
-		ObjectSpace.registerClasses(kryoServer.getKryo());
+		GlobalServerState.server = this;
+		Utils.setupKryo(kryoServer.getKryo());
+		
+		IServerHandshake ish = new ServerHandshake();
+		GlobalServerState.serverObjectSpace.register(0, ish);
 	}
 	
 	/**
@@ -109,10 +144,52 @@ public class LieroServer {
 	public void StartClient() throws IOException {
 		Client kryoClient = new Client();
 		kryoClient.start();
-		
-		kryoClient.connect(10000, Constants.SERVER_HOST, Constants.SERVER_PORT);
+		kryoClient.connect(5000, Constants.SERVER_HOST, Constants.SERVER_PORT);
 		kryoClient.setTimeout(0);
-		ObjectSpace.registerClasses(kryoClient.getKryo());
+		Utils.setupKryo(kryoClient.getKryo());
+		
+		//Get server handshake
+		IServerHandshake ish = ObjectSpace.getRemoteObject(kryoClient, 0, IServerHandshake.class);
+		
+		//Try to login, dbId stays -1 if login fails
+		int dbId = -1;
+		dbId = ish.login("anotherTest", "test");
+		
+		//We managed to login
+		if (dbId != -1) {
+			//Get our interface to the server
+			GlobalServerState.ips = ObjectSpace.getRemoteObject(kryoClient, dbId, IParticipantServer.class);
+			//Workaround to be able to link a connection to an account
+			ParticipantIdentifier ident = new ParticipantIdentifier();
+			ident.dbId = dbId;
+			kryoClient.sendTCP(ident);
+			
+			//Create a game host, send it to the server and recieve an IHostServer interface
+			HostStruct hs = new HostStruct("127.0.0.1", 2900, "ssddaa");
+			int ihsId = GlobalServerState.ips.addGame(hs);
+			
+			if (ihsId == -1) {
+				Utils.print("Failed to create game");
+				return;
+			}
+			IHostServer ihs = ObjectSpace.getRemoteObject(kryoClient, ihsId, IHostServer.class);
+			
+			//Check if someplayer with dbId is logged in and belongs to some host
+			Utils.print(ihs.isLoggedinPlayer(dbId, "127.0.0.1"));
+			
+			//Fetch games, print them and then increase the kills and deaths of this player by 10
+			ArrayList<HostStruct> games = GlobalServerState.ips.getGames();
+			for (HostStruct game : games) {
+				Utils.print(game.host + ":" + game.port + " > " + game.name);
+			}
+			ihs.savePlayerStats(dbId, 10, 10);
+		}
+		//We failed to login
+		else  {
+			Utils.print("Login failed");
+			kryoClient.close();
+		}
+		
 	}
 	
 	/**
@@ -141,19 +218,21 @@ public class LieroServer {
 	 * @param username The name of the new account
 	 * @param password The password of the new account
 	 */
-	public void register(String username, String password) {
+	public boolean register(String username, String password) {
 		Account newAccount = new Account(username, password);
 		try {
 			// The name is not available, return
 			if (isUsernameTaken(username)) {
-				return;
+				return false;
 			}
 			// Create and save and account
 			accDao.create(newAccount);
+			return true;
 		
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Something went wrong, so we return false to be sure nothing too odd happens
+			return false;
 		}
 	}
 
@@ -162,26 +241,40 @@ public class LieroServer {
 	 * 
 	 * @param username The username to check 
 	 * @param password The password that should belong to the account
-	 * @return True if the info is valid, false otherwise
+	 * @param connectionId 
+	 * @return The database id of the player if login was successful, -1 otherwise
 	 */
-	public boolean login(String username, String password) {
+	public int login(String username, String password) {
 		try {
 			// Fetch the correct account
 			List<Account> accounts = accDao.queryForEq("name", username);
-			
 			// If we don't have exactly one account for the current user, something wierd is going on, 
 			// so we return false
 			if (accounts.size() != 1) {
-				return false;
+				return -1;
+			}
+			
+			// Check if this account is already logged in
+			for (Entry<Connection, Account> entry :  GlobalServerState.connectionAccounts.entrySet()) {
+				Utils.print(entry.getValue().getName());
+				if (entry.getValue().getName().equals(username)) {
+					return -1;
+				}
 			}
 			
 			// Actually check the credentials
 			Account loginAccount = accounts.get(0);
-			return loginAccount.isCorrectPassword(password);
+			Utils.print(loginAccount.getKills()  + "  :  " + loginAccount.getDeaths());
+			if (loginAccount.isCorrectPassword(password)) {
+				IParticipantServer ips = new ParticipantServer(loginAccount.getId());
+				GlobalServerState.serverObjectSpace.register(loginAccount.getId(), ips);
+				return loginAccount.getId();
+			} 
+			return -1;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			// Something went wrong, so we return false to be sure nothing too odd happens
-			return false;
+			return -1;
 		}
 	}
 	
@@ -196,7 +289,13 @@ public class LieroServer {
 	 */
 	public void savePlayerStats(int id, int kills, int deaths) {
 		try {
-			Account acc = accDao.queryForId(id);
+			Account acc = null;
+			
+			for (Entry<Connection, Account> entry :  GlobalServerState.connectionAccounts.entrySet()) {
+				if (entry.getValue().getId() == id) {
+					acc = entry.getValue();
+				}
+			}
 			if (acc == null) {
 				return;
 			}
@@ -206,6 +305,35 @@ public class LieroServer {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Maps a databaseAccount to a connection
+	 * @param dbId
+	 */
+	private void addAccountToList(Connection conn, int dbId) {
+		try {
+			Account acc = accDao.queryForId(dbId);
+			GlobalServerState.connectionAccounts.put(conn, acc);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Checks whether the player with dbId belongs to the passed host
+	 * @param dbId The dabase id of the account
+	 * @param host The host the account is connecting from
+	 * @return True if it is a valid player with correct host, false otherwise
+	 */
+	public boolean isLoggedInPlayer(int dbId, String host) {
+		for (Entry<Connection, Account> entry :  GlobalServerState.connectionAccounts.entrySet()) {
+			if (entry.getValue().getId() == dbId && entry.getKey().getRemoteAddressTCP().getAddress().getHostAddress().equals(host)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
