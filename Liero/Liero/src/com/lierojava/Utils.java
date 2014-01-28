@@ -1,12 +1,133 @@
 package com.lierojava;
 
+import java.util.ArrayList;
+import java.util.Locale;
+
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.MassData;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Transform;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Array.ArrayIterable;
+import com.badlogic.gdx.utils.Array.ArrayIterator;
+import com.badlogic.gdx.utils.LongMap;
+import com.badlogic.gdx.utils.LongMap.Values;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import com.lierojava.bullets.Bullet;
+import com.lierojava.bullets.PistolBullet;
+import com.lierojava.enums.GameState;
+import com.lierojava.gameobjects.StaticBarrier;
+import com.lierojava.gui.HUD;
+import com.lierojava.net.handles.HostServer;
+import com.lierojava.net.handles.ParticipantHost;
+import com.lierojava.net.handles.ParticipantServer;
+import com.lierojava.net.handshake.HostHandshake;
+import com.lierojava.net.handshake.ServerHandshake;
+import com.lierojava.net.interfaces.IHostHandshake;
+import com.lierojava.net.interfaces.IHostServer;
+import com.lierojava.net.interfaces.IParticipantHost;
+import com.lierojava.net.interfaces.IParticipantServer;
+import com.lierojava.net.interfaces.IServerHandshake;
+import com.lierojava.participants.Participant;
+import com.lierojava.participants.Player;
+import com.lierojava.participants.Spectator;
+import com.lierojava.userdata.SimpleUserData;
+import com.lierojava.weapons.Jetpack;
+import com.lierojava.weapons.Pistol;
+import com.lierojava.weapons.Weapon;
 
 public class Utils {
+	/**
+	 * The class list to register with kryo instances
+	 */
+	public final static Class<?>[] classes = new Class<?>[] {
+		IParticipantHost.class,
+		IParticipantServer.class,
+		IHostServer.class,
+		IHostHandshake.class,
+		IServerHandshake.class,
+		
+		ParticipantHost.class,
+		ParticipantServer.class,
+		HostServer.class,
+		HostHandshake.class,
+		ServerHandshake.class,
+
+		Participant.class,
+		Player.class,
+		Player.PlayerState.class,
+		Spectator.class,
+		Chatroom.class,
+		PlayerData.class,
+		GameState.class,
+		StaticBarrier.class,
+		SimpleUserData.class,
+		Weapon.class,
+		Pistol.class,
+		Jetpack.class,
+		Bullet.class,
+		PistolBullet.class,
+		MainGame.class,
+		MainGameContactListener.class,
+		HUD.class,
+		
+		ArrayList.class,
+		Class.class,
+		StringBuffer.class,
+  		Locale.class,
+  		String.class,
+  		byte[].class,
+  		byte.class,
+  		char[].class,
+  		char.class,
+  		short[].class,
+  		short.class,
+  		long[].class,
+  		long.class,
+  		int[].class,
+  		int.class,
+  		float.class,
+  		float[].class,
+  		boolean[].class,
+  		boolean.class,
+		
+		World.class,
+		WorldManifold.class,
+		Body.class,
+		Array.class,
+		ArrayIterable.class,
+		ArrayIterator.class,
+		Fixture.class,
+		Filter.class,
+		Vector2.class,
+		Vector2[].class,
+		MassData.class,
+		Transform.class,
+		LongMap.class,
+		Values.class,
+		PolygonShape.class,
+		Contact.class,
+		ContactListener.class,
+		Screen.class,
+		
+		java.lang.RuntimeException.class,
+		java.lang.StackTraceElement[].class,
+		java.lang.StackTraceElement.class,
+		
+		com.badlogic.gdx.Audio.class,
+		com.badlogic.gdx.audio.Sound.class,
+	};
+	
 	/**
 	 * Get the offset for the camera.
 	 * 
@@ -67,4 +188,20 @@ public class Utils {
 		}
 		return bodies;
 	}
+	
+	/**
+	 * Registers classes with a kryo instance
+	 * @param kryo The Kryo instance to register the classes with
+	 */
+	public static void setupKryo(Kryo kryo) {
+		kryo.setReferences(true);
+		kryo.setRegistrationRequired(false);
+		ObjectSpace.registerClasses(kryo);
+		for (Class<?> cls : classes) {
+			kryo.register(cls);
+		}
+		//kryo.setReferenceResolver(new com.esotericsoftware.kryo.util.MapReferenceResolver());
+		//kryo.setDefaultSerializer(com.esotericsoftware.kryo.serializers..class);
+	}
+
 }
