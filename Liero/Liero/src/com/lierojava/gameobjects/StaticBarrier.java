@@ -9,9 +9,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.lierojava.Constants;
-import com.lierojava.GlobalState;
 import com.lierojava.bullets.Bullet;
+import com.lierojava.client.GlobalState;
 import com.lierojava.net.RenderProxy;
+import com.lierojava.net.TextureRenderProxy;
 
 public class StaticBarrier extends GameObject {
 	/**
@@ -89,8 +90,19 @@ public class StaticBarrier extends GameObject {
 
 	@Override
 	public ArrayList<RenderProxy> render() {
-		return null;
-		// TODO Auto-generated method stub
+		ArrayList<RenderProxy> proxies = new ArrayList<RenderProxy>() {{
+			add(new TextureRenderProxy("border", new Vector2(-Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2), new Vector2(Gdx.graphics.getWidth(), Constants.BARRIER_SIZE), 0, false, false, false, true));
+			add(new TextureRenderProxy("border", new Vector2(-Gdx.graphics.getWidth() / 2 + 1, Gdx.graphics.getHeight() / 2 - Constants.BARRIER_SIZE), new Vector2(Gdx.graphics.getWidth(), Constants.BARRIER_SIZE), 0, false, false, false, true));
+			add(new TextureRenderProxy("border", new Vector2(-Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2), new Vector2(Constants.BARRIER_SIZE, Gdx.graphics.getHeight()), 0, false, false, false, true));
+			add(new TextureRenderProxy("border", new Vector2(Gdx.graphics.getWidth() / 2 - Constants.BARRIER_SIZE, -Gdx.graphics.getHeight() / 2), new Vector2(Constants.BARRIER_SIZE, Gdx.graphics.getHeight()), 0, false, false, false, true));
+		}};
+
+		// Set z-index.
+		for (RenderProxy rp : proxies) {
+			rp.zindex = 1;
+		}
+		
+		return proxies;
 	}
 
 	/**

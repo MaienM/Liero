@@ -12,12 +12,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.utils.Array;
 import com.lierojava.Constants;
-import com.lierojava.GlobalState;
 import com.lierojava.PlayerData;
 import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
+import com.lierojava.client.GlobalState;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
@@ -140,7 +139,7 @@ public class Player extends GameObject {
 	 * Render the player.
 	 * @return 
 	 */
-	@SuppressWarnings("incomplete-switch")
+	@SuppressWarnings({ "incomplete-switch", "serial" })
 	public ArrayList<RenderProxy> render() {
 		final TextureRenderProxy rp = new TextureRenderProxy();
 		
@@ -302,11 +301,10 @@ public class Player extends GameObject {
 								  0); 
 				
 				
-				//Remove any ground objects the player would collide with on spawn
-				//Perform microstep to calculate collisions of the newly created player
+				// Remove any ground objects the player would collide with on spawn
+				// Perform microstep to calculate collisions of the newly created player
 				GlobalState.currentGame.world.step(1f/120f, 8, 3);
-				Array<Contact> contacts = Utils.getContacts(body);
-				for (Contact c : contacts) {
+				for (Contact c : Utils.getContacts(body)) {
 					if (c.getFixtureA().getBody().getUserData() instanceof Ground) {
 						Body fa = c.getFixtureA().getBody();
 						fa.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);

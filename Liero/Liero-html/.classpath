@@ -13,5 +13,4 @@
     <classpathentry exported="true" kind="lib" path="/Liero/libs/gdx.jar" sourcepath="/Liero/libs/gdx-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="/Liero/libs/tween-engine-api-sources.jar"/>
     <classpathentry exported="true" kind="lib" path="/Liero/libs/tween-engine-api.jar" sourcepath="/Liero/libs/tween-engine-api-sources.jar"/>
-    <classpathentry exported="true" kind="lib" path="/home/user/Documenten/gwt-user.jar"/>
 </classpath>

@@ -8,9 +8,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.lierojava.Constants;
-import com.lierojava.GlobalState;
 import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
+import com.lierojava.client.GlobalState;
 import com.lierojava.net.RenderProxy;
 import com.lierojava.net.TextureRenderProxy;
 import com.lierojava.userdata.SimpleUserData;
@@ -48,6 +48,7 @@ public class Ground extends GameObject {
 		box.dispose();
 	}
 
+	@SuppressWarnings("serial")
 	@Override
 	public ArrayList<RenderProxy> render() {
 		return new ArrayList<RenderProxy>() {{

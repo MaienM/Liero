@@ -4,7 +4,7 @@ public class PlayerData {
 	/**
 	 * The name of the player.
 	 */
-	public String name = "";
+	public String name = "MaienM";
 	
 	/**
 	 * The number of kills this player has made.

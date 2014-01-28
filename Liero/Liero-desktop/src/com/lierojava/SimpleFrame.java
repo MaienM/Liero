@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.lierojava.client.Liero;
 
 public class SimpleFrame extends JFrame {
 	private JTextField tbHost;

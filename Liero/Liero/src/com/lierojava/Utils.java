@@ -1,7 +1,10 @@
 package com.lierojava;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Locale;
+=======
+>>>>>>> 363b18c6c83db40a5d1959a66838747dd233bc7b
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -17,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.Transform;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.utils.Array;
+<<<<<<< HEAD
 import com.badlogic.gdx.utils.Array.ArrayIterable;
 import com.badlogic.gdx.utils.Array.ArrayIterator;
 import com.badlogic.gdx.utils.LongMap;
@@ -45,6 +49,10 @@ import com.lierojava.userdata.SimpleUserData;
 import com.lierojava.weapons.Jetpack;
 import com.lierojava.weapons.Pistol;
 import com.lierojava.weapons.Weapon;
+=======
+import com.lierojava.client.GlobalState;
+import com.lierojava.gameobjects.GameObject;
+>>>>>>> 363b18c6c83db40a5d1959a66838747dd233bc7b
 
 public class Utils {
 	/**
@@ -160,8 +168,8 @@ public class Utils {
 	 * @param b The body.
 	 * @return A list of all the contacts for this body.
 	 */
-	public static Array<Contact> getContacts(Body b) {
-		Array<Contact> contacts = new Array<Contact>();
+	public static ArrayList<Contact> getContacts(Body b) {
+		ArrayList<Contact> contacts = new ArrayList<Contact>();
 		for (Contact c : GlobalState.currentGame.world.getContactList()) {
 			if (c.getFixtureA().getBody() == b || c.getFixtureB().getBody() == b) {
 				contacts.add(c);
@@ -176,8 +184,8 @@ public class Utils {
 	 * @param b The body.
 	 * @return A list of all the bodies that are in contact with this body.
 	 */
-	public static Array<Body> getContactBodies(Body b) {
-		Array<Body> bodies = new Array<Body>();
+	public static ArrayList<Body> getContactBodies(Body b) {
+		ArrayList<Body> bodies = new ArrayList<Body>();
 		for (Contact c : Utils.getContacts(b)) {
 			if (c.getFixtureA().getBody() == b) {
 				bodies.add(c.getFixtureB().getBody());
@@ -204,4 +212,22 @@ public class Utils {
 		//kryo.setDefaultSerializer(com.esotericsoftware.kryo.serializers..class);
 	}
 
+	/*
+	 * Get all game objects.
+	 * @return A list of all game objects.
+	 */
+	public static ArrayList<GameObject> getGameObjects() {
+		Array<Body> bodies = new Array<Body>();
+		GlobalState.currentGame.world.getBodies(bodies);
+		ArrayList<GameObject> objects = new ArrayList<GameObject>();
+		for (Body b : bodies) {
+			if (b.getUserData() instanceof GameObject) {
+				GameObject obj = (GameObject)b.getUserData();
+				if (!objects.contains(obj)) {
+					objects.add(obj);
+				}
+			}
+		}
+		return objects;
+	}
 }

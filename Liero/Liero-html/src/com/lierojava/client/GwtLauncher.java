@@ -1,6 +1,5 @@
 package com.lierojava.client;
 
-import com.lierojava.Liero;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
