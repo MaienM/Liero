@@ -17,7 +17,6 @@ import com.lierojava.Constants;
 import com.lierojava.Utils;
 import com.lierojava.client.GlobalState;
 import com.lierojava.enums.AccountState;
-import com.lierojava.net.interfaces.IParticipantChat;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.net.interfaces.IServerHandshake;
 import com.lierojava.server.data.ParticipantIdentifier;
@@ -143,10 +142,6 @@ public class LoginScreen extends BaseScreen {
 			ParticipantIdentifier ident = new ParticipantIdentifier();
 			ident.dbId = dbId;
 			kryoClient.sendTCP(ident);
-			
-			// Get the global chat handle
-			int index = GlobalState.ips.getChatInstance();
-			GlobalState.ipc = ObjectSpace.getRemoteObject(kryoClient, index, IParticipantChat.class);
 			
 			// Go to the lobby.
 			Gdx.app.getApplicationListener();

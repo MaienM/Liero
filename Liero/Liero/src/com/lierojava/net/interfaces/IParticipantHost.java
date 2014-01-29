@@ -2,6 +2,7 @@ package com.lierojava.net.interfaces;
 
 import java.util.ArrayList;
 
+import com.lierojava.PlayerData;
 import com.lierojava.participants.Player;
 import com.lierojava.render.RenderProxy;
 
@@ -10,7 +11,7 @@ import com.lierojava.render.RenderProxy;
  * 
  * @author Michon
  */
-public interface IParticipantHost {
+public interface IParticipantHost extends IChat {
 	/**
 	 * @see Player.moveLeft
 	 */
@@ -60,15 +61,22 @@ public interface IParticipantHost {
 	 * @see Player.getWeaponIndex
 	 */
 	public abstract int getWeaponIndex();
-	
-	/**
-	 * TODO: @see this.
-	 */
-	public abstract void chat(String message);
 
 	/**
 	 * Get the render proxies.
 	 * @return The list of render proxies.
 	 */
 	public abstract ArrayList<RenderProxy> getRenderProxies();
+	
+	/**
+	 * Get the score.
+	 * @return The list of playerdata.
+	 */
+	public abstract ArrayList<PlayerData> getScores();
+
+	/**
+	 * Get the remaining time.
+	 * @return The remaining time.
+	 */
+	public abstract float getTimeRemaining();
 }

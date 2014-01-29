@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * @author Subhi
  *
  */
-public interface IParticipantChat {
+public interface IChat {
 	/**
 	 * Returns all messages since the last request
 	 * @return ArrayList<String> of messages, or an empty ArrayList<String> if none were added

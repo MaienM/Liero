@@ -14,9 +14,10 @@ public interface IHostHandshake {
 	/**
 	 * Perform a handshake between a participant and the host. 
 	 * @param isPlayer True if the participant wants to play, false otherwise.
-	 * @param playerID The ID of the player that wants to play. May be invalid for non-players.
-	 * @param weapons 
+	 * @param playerID The ID of the player that wants to play. 
+	 * @param playerName The name of the playet that want to play. 
+	 * @param weapons A list of weapon classes that this player wants to use. NULL for non-players.
 	 * @return The index of the IParticipantHost object (for communication), if successful.
 	 */
-	public int requestParticipant(boolean isPlayer, int playerID, ArrayList<Class<? extends Weapon>> weapons);
+	public int requestParticipant(boolean isPlayer, int playerID, String playerName, ArrayList<Class<? extends Weapon>> weapons);
 }

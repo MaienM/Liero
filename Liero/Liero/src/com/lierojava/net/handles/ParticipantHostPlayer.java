@@ -2,7 +2,7 @@ package com.lierojava.net.handles;
 
 import java.util.ArrayList;
 
-import com.esotericsoftware.kryonet.Connection;
+import com.lierojava.PlayerData;
 import com.lierojava.client.GlobalState;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
@@ -13,20 +13,18 @@ import com.lierojava.render.RenderProxy;
  * 
  * @author Michon
  */
-public class ParticipantHost implements IParticipantHost {
+public class ParticipantHostPlayer extends Chat implements IParticipantHost {
 	
 	/**
 	 * The player object.
 	 */
 	public int index = 0;
 	
-	/**
-	 * The connection to this participant.
-	 */
-	public Connection connection;
-	
-	public ParticipantHost() {}
-	public ParticipantHost(Player player) {
+	public ParticipantHostPlayer() {
+		super(false);
+	}
+	public ParticipantHostPlayer(Player player) {
+		this();
 		if (player != null) {
 			this.index = GlobalState.currentGame.players.indexOf(player);
 		}
@@ -59,12 +57,17 @@ public class ParticipantHost implements IParticipantHost {
 
 	@Override
 	public void jetpack() {
-		GlobalState.currentGame.players.get(index).jetpack();
+		if (GlobalState.currentGame.world.isLocked()) return;
+		synchronized (GlobalState.currentGame.world) {
+			GlobalState.currentGame.players.get(index).jetpack();
+		}
 	}
 
 	@Override
 	public void fire() {
-		GlobalState.currentGame.players.get(index).fire();
+		synchronized (GlobalState.currentGame.world) {
+			GlobalState.currentGame.players.get(index).fire();
+		}
 	}
 	
 	@Override
@@ -81,18 +84,28 @@ public class ParticipantHost implements IParticipantHost {
 	public int getWeaponIndex() {
 		return GlobalState.currentGame.players.get(index).getWeaponIndex();
 	}
-
-	@Override
-	public void chat(String message) {
-		// TODO Auto-generated method stub
-		
-	}
 	
+	@Override
+	public void sendMessage(String message) {
+		super.sendMessage(GlobalState.currentGame.players.get(index).data.name + "> " + message);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<RenderProxy> getRenderProxies() {
+		if (GlobalState.currentGame.world.isLocked()) return null;
 		synchronized (GlobalState.currentGame.renderProxies) {
 			return (ArrayList<RenderProxy>)GlobalState.currentGame.renderProxies.clone();
 		}
+	}
+	
+	@Override
+	public ArrayList<PlayerData> getScores() {
+		return GlobalState.currentGame.scores;
+	}
+	
+	@Override
+	public float getTimeRemaining() {
+		return GlobalState.currentGame.timeRemaining;
 	}
 }

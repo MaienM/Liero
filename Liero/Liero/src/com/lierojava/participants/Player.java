@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.esotericsoftware.kryonet.Connection;
 import com.lierojava.Constants;
 import com.lierojava.PlayerData;
 import com.lierojava.Utils;
@@ -29,11 +30,6 @@ import com.lierojava.weapons.Jetpack;
 import com.lierojava.weapons.Weapon;
 
 public class Player extends GameObject {
-	/**
-	 * The player ID.
-	 */
-	private int playerID;
-	
 	/**
 	 * The Box2D body for the player. 
 	 * 
@@ -95,10 +91,13 @@ public class Player extends GameObject {
 	 * The show weapon countdown thread.
 	 */
 	public Thread showWeaponThread;
+
+	/**
+	 * The Connection for this player.
+	 */
+	public Connection connection;
 	
-	public Player(int playerID, ArrayList<Class<? extends Weapon>> weapons) {
-		this.playerID = playerID;
-		
+	public Player(ArrayList<Class<? extends Weapon>> weapons) {	
 		// Set the weapons.
 		this.weapons = new ArrayList<Weapon>();
 		for (Class<? extends Weapon> wc : weapons) {
@@ -118,14 +117,15 @@ public class Player extends GameObject {
 				e.printStackTrace();
 			}
 		}
-		Utils.print(this.weapons);
 		currentWeapon = this.weapons.get(0);
 	
 		// Create the body.
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.fixedRotation = true;
-		body = GlobalState.currentGame.world.createBody(bodyDef);
+		synchronized (GlobalState.currentGame.world) {
+			body = GlobalState.currentGame.world.createBody(bodyDef);
+		}
 		body.setUserData(this);
 				
 		// Create the player shape.
