@@ -26,7 +26,7 @@ public class ParticipantChat implements IParticipantChat {
 		if (isGlobalChat) {
 			messages = GlobalServerState.chatMessages;
 		} else {
-			messages = GlobalState.chatMessages;
+			messages = GlobalState.currentGame.chatMessages;
 		}
 	}
 	

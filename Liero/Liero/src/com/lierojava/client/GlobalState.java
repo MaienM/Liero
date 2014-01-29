@@ -1,10 +1,10 @@
 package com.lierojava.client;
 
-import java.util.ArrayList;
-
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import com.lierojava.enums.GameState;
+import com.lierojava.net.interfaces.IParticipantChat;
+import com.lierojava.net.interfaces.IParticipantServer;
 
 public class GlobalState {
 	/**
@@ -33,7 +33,12 @@ public class GlobalState {
 	public static Connection lastSender;
 	
 	/**
-	 * A complete list of all sent chat messages
+	 * The handle to the global server.
 	 */
-	public static ArrayList<String> chatMessages = new ArrayList<String>();
+	public static IParticipantServer ips;
+	
+	/**
+	 * The chat handle to the global server.
+	 */
+	public static IParticipantChat ipc;
 }

@@ -1,15 +1,24 @@
 package com.lierojava.gui;
 
+import java.io.IOException;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import com.lierojava.Constants;
 import com.lierojava.Utils;
+import com.lierojava.client.GlobalState;
+import com.lierojava.enums.AccountState;
+import com.lierojava.net.interfaces.IParticipantChat;
+import com.lierojava.net.interfaces.IParticipantServer;
+import com.lierojava.net.interfaces.IServerHandshake;
+import com.lierojava.server.data.ParticipantIdentifier;
 
 public class LoginScreen extends BaseScreen {
 	public LoginScreen(Game game) {
@@ -18,9 +27,7 @@ public class LoginScreen extends BaseScreen {
 
 	@Override
     public void show() {   
-    	super.show(400);
-    	
-    	Utils.print("Login");
+    	super.show(340);
 
     	// Spacer;
     	table.add().expandY();
@@ -82,38 +89,92 @@ public class LoginScreen extends BaseScreen {
     
     private boolean validate(String username, String password) {
     	if (username.isEmpty() || password.isEmpty()) {
-    		// TODO: Scale the dialog properly.
-    		stage.addActor(
-    			new Dialog("Invalid username/password", Constants.SKIN) {
-    				{
-    					this.setBounds(Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight() / 4, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-    				}
-    				
-    				@Override
-    				protected void result(Object obj) {
-    					this.setVisible(false);
-    				}
-    			}
-	    			.text("The username and password can not be empty")
-	    			.button("OK", true)
-            );
+    		showDialog("Username/password empty", "The have to enter an username and password.");
     		return false;
     	}
     	return true;
     }
     
-    private void login(String username, String password) {
-    	if (!validate(username, password)) {
+	/**
+	 * Connects to the server
+	 * 
+	 * @throws IOException
+	 */
+	public void login(String username, String password) {
+		if (!validate(username, password)) {
     		return;
     	}
-    	
-    	Gdx.app.getApplicationListener();
-    	game.setScreen(new LobbyScreen(game));
-    }
+
+		// Connect to the server.
+		Client kryoClient = connectServer();
+		if (kryoClient == null) {
+			return;
+		}
+		
+		// Get server handshake
+		IServerHandshake ish = ObjectSpace.getRemoteObject(kryoClient, 0, IServerHandshake.class);
+		
+		// Try to login, dbId is -1 if login fails
+		int dbId = ish.login(username, password);
+		
+		// We managed to login, set some values
+		if (dbId != -1) {
+			// Get our interface to the server
+			GlobalState.ips = ObjectSpace.getRemoteObject(kryoClient, dbId, IParticipantServer.class);
+			
+			// Workaround to be able to link a connection to an account
+			ParticipantIdentifier ident = new ParticipantIdentifier();
+			ident.dbId = dbId;
+			kryoClient.sendTCP(ident);
+			
+			// Get the global chat handle
+			int index = GlobalState.ips.getChatInstance();
+			GlobalState.ipc = ObjectSpace.getRemoteObject(kryoClient, index, IParticipantChat.class);
+			
+			// Go to the lobby.
+			Gdx.app.getApplicationListener();
+	    	game.setScreen(new LobbyScreen(game));
+		}
+		
+		// We failed to login
+		else  {
+			kryoClient.close();
+			showDialog("Invalid username/password", "The entered username and/or password are not known.");
+		}
+	}
 
     private void register(String username, String password) {
     	if (!validate(username, password)) {
     		return;
     	}
+    	
+    	Client kryoClient = new Client();
+		kryoClient.start();
+		try {
+			kryoClient.connect(5000, Constants.SERVER_HOST, Constants.SERVER_PORT);
+		} catch (IOException e) {
+			showDialog("Server not reachable", "The server is not responding. Please try again later.");
+			return;
+		}
+		kryoClient.setTimeout(0);
+		Utils.setupKryo(kryoClient.getKryo());
+		
+		// Get server handshake
+		IServerHandshake ish = ObjectSpace.getRemoteObject(kryoClient, 0, IServerHandshake.class);
+		
+		// Try to register.
+		AccountState result = ish.register(username, password);
+		
+		// Close the connection.
+		kryoClient.close();
+		
+		// Display the result.
+		if (result == AccountState.USERNAMETAKEN) {
+			showDialog("Username is taken", "The given username is already in use. Please choose another username.");
+		}
+		else {
+			login(username, password);
+			((BaseScreen)game.getScreen()).showDialog("Account created", "Your account was successfully created.");
+		}
     }
 }

@@ -1,5 +1,7 @@
 package com.lierojava.gui;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,25 +14,30 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.lierojava.Constants;
-import com.lierojava.Utils;
+import com.lierojava.client.GlobalState;
+import com.lierojava.client.MainGame;
+import com.lierojava.server.data.HostStruct;
 
 public class LobbyScreen extends BaseScreen {
+	/**
+	 * The currently active games.
+	 */
+	private ArrayList<HostStruct> games;
+	
 	public LobbyScreen(Game game) {
 		super(game);
 	}
 	
 	@Override
     public void show() {   
-    	super.show(600f);
-    	
-    	Utils.print("Lobby");
+    	super.show(600);
     	
     	// Left panel: stats + chat.
     	final Table tblLeft = new Table();
     	table.add(tblLeft).size(screen.x / 2, screen.y);
     
     	// Title.
-    	final Label lblTitle = new Label("Welcome, <NAME>", Constants.SKIN, "label-title-small");
+    	final Label lblTitle = new Label("Welcome, " + GlobalState.ips.getName(), Constants.SKIN, "label-title-small");
     	tblLeft.add(lblTitle).colspan(2);
     	tblLeft.row();
     	
@@ -74,7 +81,7 @@ public class LobbyScreen extends BaseScreen {
     	tblRight.row();
     	
     	// Game listing.    	
-    	final List listGames = new List(new Object[] { "Hello", "World", "!?!?" }, Constants.SKIN);
+    	final List listGames = new List(refreshHosts(), Constants.SKIN);
     	listGames.setColor(Color.BLACK);
     	
     	final ScrollPane scrollGames = new ScrollPane(listGames);
@@ -90,7 +97,14 @@ public class LobbyScreen extends BaseScreen {
         
         btnJoin.addListener(new ClickListener(){
             @Override 
-            public void clicked(InputEvent event, float x, float y){
+            public void clicked(InputEvent event, float x, float y) {
+            	if (listGames.getSelectedIndex() < 0) {
+            		showDialog("Select a game", "You must first select a game to join");
+            		return;
+            	}
+            	
+            	// TODO: Port.
+            	game.setScreen(new MainGame(game, games.get(listGames.getSelectedIndex()).host));
             }
         });
         
@@ -102,6 +116,8 @@ public class LobbyScreen extends BaseScreen {
         btnHost.addListener(new ClickListener(){
             @Override 
             public void clicked(InputEvent event, float x, float y){
+            	// TODO: Weapon select screen first.
+				game.setScreen(new MainGame(game, null));
             }
         });
         
@@ -113,12 +129,17 @@ public class LobbyScreen extends BaseScreen {
         btnRefresh.addListener(new ClickListener(){
             @Override 
             public void clicked(InputEvent event, float x, float y){
-            	String[] b = new String[50];
-            	for (int i = 0; i < b.length; i++) {
-            		b[i] = "Hello " + i;
-            	}
-            	listGames.setItems(b);
+            	listGames.setItems(refreshHosts());
             }
         });
     }
+	
+	public String[] refreshHosts() {
+		games = GlobalState.ips.getGames();
+		String[] names = new String[games.size()];
+		for (int i = 0; i < games.size(); i++) {
+			names[i] = games.get(i).name;
+		}
+		return names;
+	}
 }

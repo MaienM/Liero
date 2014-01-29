@@ -2,7 +2,6 @@ package com.lierojava.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -10,7 +9,6 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -20,11 +18,8 @@ import com.lierojava.Constants;
 import com.lierojava.Utils;
 import com.lierojava.net.handles.ParticipantServer;
 import com.lierojava.net.handshake.ServerHandshake;
-import com.lierojava.net.interfaces.IHostServer;
-import com.lierojava.net.interfaces.IParticipantChat;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.net.interfaces.IServerHandshake;
-import com.lierojava.server.data.HostStruct;
 import com.lierojava.server.data.ParticipantIdentifier;
 import com.lierojava.server.database.Account;
 
@@ -46,35 +41,22 @@ public class LieroServer {
     Dao<Account, Integer> accDao;
     
     /**
-     * Boolean to determine whether we are a server or a client
+     * Starts the server
+     * @param args
+     * @throws IOException 
      */
-    private boolean isHost = true;
-    
+	public static void main(String[] args) throws IOException {
+		new LieroServer();
+	}
+	
     /**
      * Server constructor, tries to connect to the database
+     * @throws IOException 
      */
-    public LieroServer() {
-    	//Try to start a server
-		try {
-			StartServer();
-		} catch (IOException e1) {
-			try {
-				//That failed, try to start as client then
-				StartClient();
-				isHost = false;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			e1.printStackTrace();
-		}
-		
-		//Initialization below this point is Serverside only
-		if (!isHost) {
-			return;
-		}
-		
-		//Initialize database and make sure table exists
+    public LieroServer() throws IOException {
+    	startServer();
+
+		// Initialize database and make sure table exists
 		try {
 			connectionSource = new JdbcConnectionSource(connectionString);
 			accDao = DaoManager.createDao(connectionSource, Account.class);
@@ -84,103 +66,51 @@ public class LieroServer {
 		}
     }
     
-    /**
-     * Starts the server
-     * @param args
-     */
-	public static void main(String[] args) {
-		new LieroServer();
-	}
-	
 	/**
 	 * Starts the server
 	 * 
 	 * @throws IOException
 	 */
-	public void StartServer() throws IOException {
+	public void startServer() throws IOException {
 		Server kryoServer = new Server();
 		kryoServer.start();
 		kryoServer.bind(Constants.SERVER_PORT);
 		kryoServer.addListener(new Listener() {
-            @Override
+			@Override
 			public void connected(final Connection connection) {
-           	 GlobalServerState.serverObjectSpace.addConnection(connection);
-           	 Utils.print(connection.getID());
-           	 if (connection.getRemoteAddressTCP().getAddress() == null) {
-           		 connection.close();
-           	 }
-            }
+				GlobalServerState.serverObjectSpace.addConnection(connection);
+				Utils.print(connection.getID());
+				if (connection.getRemoteAddressTCP().getAddress() == null) {
+					connection.close();
+				}
+			}
 
-            @Override
+			@Override
 			public void disconnected(Connection connection) {
-            	//Cleans up a connection and removes a game if the connection had any
-            	if (GlobalServerState.connectionAccounts.containsKey(connection)) {
-            		Account acc = GlobalServerState.connectionAccounts.get(connection);
-            		if (GlobalServerState.accountGame.containsKey(acc.getId())) {
-            			GlobalServerState.accountGame.remove(acc.getId());
-            		}
-            	}
-            	GlobalServerState.connectionAccounts.remove(connection);
-            }
+				// Cleans up a connection and removes a game if the connection had any
+				if (GlobalServerState.connectionAccounts.containsKey(connection)) {
+					Account acc = GlobalServerState.connectionAccounts.get(connection);
+					if (GlobalServerState.accountGame.containsKey(acc.getId())) {
+						GlobalServerState.accountGame.remove(acc.getId());
+					}
+				}
+				GlobalServerState.connectionAccounts.remove(connection);
+			}
 
-            @Override
+			@Override
 			public void received(Connection connection, Object object) {
-            	//ParticipantIdentifier is a class solely made to attach a connection to a player
-            	if (object instanceof ParticipantIdentifier) {
-            		GlobalServerState.server.addAccountToList(connection, ((ParticipantIdentifier) object).dbId);
-            	}
-            }
-        });
+				// ParticipantIdentifier is a class solely made to attach a connection to a player
+				if (object instanceof ParticipantIdentifier) {
+					GlobalServerState.server.addAccountToList(connection,
+							((ParticipantIdentifier) object).dbId);
+				}
+			}
+		});
 		GlobalServerState.server = this;
 		Utils.setupKryo(kryoServer.getKryo());
-		
+
 		IServerHandshake ish = new ServerHandshake();
 		GlobalServerState.serverObjectSpace.register(0, ish);
-	}
-	
-	/**
-	 * Connects to the server
-	 * 
-	 * @throws IOException
-	 */
-	public void StartClient() throws IOException {
-		Client kryoClient = new Client();
-		kryoClient.start();
-		kryoClient.connect(5000, Constants.SERVER_HOST, Constants.SERVER_PORT);
-		kryoClient.setTimeout(0);
-		Utils.setupKryo(kryoClient.getKryo());
-		
-		//Get server handshake
-		IServerHandshake ish = ObjectSpace.getRemoteObject(kryoClient, 0, IServerHandshake.class);
-		
-		//Try to login, dbId stays -1 if login fails
-		int dbId = -1;
-		dbId = ish.login("anotherTest", "test");
-		
-		//We managed to login, set some values
-		if (dbId != -1) {
-			//Get our interface to the server
-			GlobalServerState.ips = ObjectSpace.getRemoteObject(kryoClient, dbId, IParticipantServer.class);
-			//Workaround to be able to link a connection to an account
-			ParticipantIdentifier ident = new ParticipantIdentifier();
-			ident.dbId = dbId;
-			kryoClient.sendTCP(ident);
-			
-			// Get the global chat handle
-			int index = GlobalServerState.ips.getChatInstance();
-			GlobalServerState.ipc = ObjectSpace.getRemoteObject(kryoClient, index, IParticipantChat.class);
-			
-			//-------Run test functionality---------
-			//TODO: Remove
-			//-------Run test functionality---------
-			this.testClientFunctionality(kryoClient, dbId);
-		}
-		//We failed to login
-		else  {
-			Utils.print("Login failed");
-			kryoClient.close();
-		}
-		
 	}
 	
 	/**
@@ -332,18 +262,7 @@ public class LieroServer {
 	 * TODO: remove
 	 */
 	private void testClientFunctionality(Client kryoClient, int dbId) {
-		//Create a game host, send it to the server and receive an IHostServer interface
-		HostStruct hs = new HostStruct("127.0.0.1", 2900, "ssddaa");
-		int ihsId = GlobalServerState.ips.addGame(hs);
-		
-		if (ihsId == -1) {
-			Utils.print("Failed to create game");
-			return;
-		}
-		IHostServer ihs = ObjectSpace.getRemoteObject(kryoClient, ihsId, IHostServer.class);
-		
-		//Check if someplayer with dbId is logged in and belongs to some host
-		Utils.print(ihs.isLoggedinPlayer(dbId, "127.0.0.1"));
+		/*
 		
 		//Fetch games, print them and then increase the kills and deaths of this player by 10
 		ArrayList<HostStruct> games = GlobalServerState.ips.getGames();
@@ -369,7 +288,7 @@ public class LieroServer {
 		for (String message : messages) {
 			Utils.print(message);
 		}
-
+		 */
 	}
 
 }

@@ -1,13 +1,14 @@
 package com.lierojava.client;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -20,6 +21,11 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import com.lierojava.Constants;
 import com.lierojava.PlayerData;
 import com.lierojava.Utils;
@@ -27,14 +33,21 @@ import com.lierojava.bullets.Bullet;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
+import com.lierojava.gui.BaseScreen;
 import com.lierojava.gui.HUD;
+import com.lierojava.gui.LobbyScreen;
 import com.lierojava.net.RenderProxy;
+import com.lierojava.net.handles.ParticipantHost;
+import com.lierojava.net.handshake.HostHandshake;
+import com.lierojava.net.interfaces.IHostHandshake;
+import com.lierojava.net.interfaces.IHostServer;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
+import com.lierojava.server.data.HostStruct;
 import com.lierojava.userdata.PendingAction;
 import com.lierojava.userdata.SimpleUserData;
 
-public class MainGame implements Screen {
+public class MainGame extends BaseScreen {
 	/**
 	 * The Box2D world.
 	 */
@@ -67,9 +80,10 @@ public class MainGame implements Screen {
 	public ArrayList<Player> players = new ArrayList<Player>();
 	
 	/**
-	 * Whether this instance is hosting the game.
+	 * The host. 
+	 * If this is null it means we are the host.
 	 */
-	public boolean isHost;
+	public String host;
 
 	/**
 	 * Renders sprites.
@@ -85,6 +99,11 @@ public class MainGame implements Screen {
 	 * The IParticipantHost object, for communication to the host.
 	 */
 	public IParticipantHost iph;
+	
+	/**
+	 * The IHostServer object, for communication to the global server.
+	 */
+	private IHostServer ihs;
 
 	/**
 	 * Whether we want the score window to be visible.
@@ -104,17 +123,108 @@ public class MainGame implements Screen {
 	private KeyHandler toggleDebugKey = new KeyHandler(1f, Keys.F12);
 
 	/**
+	 * The chat.
+	 */
+	public ArrayList<String> chatMessages;
+
+	/**
 	 * Create a new game.
 	 */
-	public MainGame() {				
-		// Mark self as host.
-		// TODO: Only set this when actually host.
-		isHost = true;
+	public MainGame(Game game, String host) {
+		super(game);
+		
+		// Update global state.
+		GlobalState.currentGame = this;
+		
+		// Save host info.
+		this.host = host;
 		
 		// Create a new sprite batch.
-		batch = new SpriteBatch();
+		this.batch = new SpriteBatch();
 	}
 
+	/**
+	 * Start a new game as host.
+	 * @throws IOException
+	 */
+	private void startServer() throws IOException {
+		Server server = new Server(12800 * 1024, 1600 * 1024);
+		Utils.setupKryo(server.getKryo());
+		server.start();
+		// TODO: Dynamic port detection.
+		server.bind(Constants.PORT, Constants.PORT);
+		
+		server.addListener(new Listener() {
+			@Override
+			public void connected(final Connection connection) {
+            	Utils.print("Connection");
+            	GlobalState.objectSpace.addConnection(connection);
+			}
+
+            @Override
+			public void disconnected(Connection connection) {
+            	Utils.print("Client lost");
+            }
+
+            @Override
+			public void received(Connection connection, Object object) {
+            	GlobalState.lastSender = connection;
+            }
+        });
+		
+		// Setup the handshake object.
+		IHostHandshake ihh = new HostHandshake();
+		GlobalState.objectSpace.register(0, ihh);
+		
+		// Get an IParticipantHost object for the local player.
+		ihh.requestParticipant(true, 0);
+		iph = new ParticipantHost(players.get(0));
+		
+		// Connect to the global server.
+		Client kryoClient = connectServer();
+		if (kryoClient == null) {
+			return;
+		}
+		
+		// Register the host.
+		// TODO: Remove hardcoded values.
+		HostStruct hs = new HostStruct("127.0.0.1", Constants.PORT, "Liero Game");
+		int ihsId = GlobalState.ips.addGame(hs);
+		
+		if (ihsId == -1) {
+			BaseScreen screen = new LobbyScreen(game);
+			screen.showDialog("Something went wrong", "Something went wrong trying to register with the server. Aborting.");
+			game.setScreen(screen);
+			return;
+		}
+		
+		// Get the IHostServer object.
+		ihs = ObjectSpace.getRemoteObject(kryoClient, ihsId, IHostServer.class);
+	}
+	
+	/**
+	 * Join an existing game as client. 
+	 */
+	private void startClient() {
+		Client client = new Client(6400 * 1024, 1600 * 1024);
+		Utils.setupKryo(client.getKryo());
+		client.start();
+		try {
+			client.connect(5000, host, Constants.PORT, Constants.PORT);
+		} catch (IOException e) {
+			BaseScreen screen = new LobbyScreen(game);
+			screen.showDialog("Port in use", "The port Liero uses for hosting servers is already in use. Are you already running a server? Aborting.");
+			game.setScreen(screen);
+			return;
+		}
+		client.setTimeout(0);
+
+		IHostHandshake ihh = ObjectSpace.getRemoteObject(client, 0, IHostHandshake.class);
+		int index = ihh.requestParticipant(true, 1);
+		if (index > 0) {
+			iph = ObjectSpace.getRemoteObject(client, index, IParticipantHost.class);
+		}
+	}
 	/**
 	 * Gets executed once every frame.
 	 * 
@@ -127,7 +237,7 @@ public class MainGame implements Screen {
 			handleInput();
 					
 			// Perform a game step.
-			if (isHost) {
+			if (host == null) {
 				update();
 			} 
 			else {
@@ -234,7 +344,7 @@ public class MainGame implements Screen {
 		
 		// Remove unwanted objects.
 		removeBodies();
-		
+
 		// Update the list of render proxies.
 		synchronized (renderProxies) {
 			renderProxies.clear();
@@ -324,8 +434,19 @@ public class MainGame implements Screen {
 
 	@Override
 	public void show() {
+		// Create the camera.
+		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		// If not host, connect to the host and stop.
+		if (host != null) {
+			startClient();
+			return;
+		}
+		
 		// Create the world.
 		world = new World(new Vector2(0, -10), true);
+		new StaticBarrier();
+		fillWorld();
 		
 		// Create the debug renderer.
 		debugRenderer = new Box2DDebugRenderer();
@@ -336,19 +457,16 @@ public class MainGame implements Screen {
 		debugRenderer.setDrawJoints(false);
 		debugRenderer.setDrawVelocities(false);
 		
-		// Create the camera.
-		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		
-		// If not host, stop now.
-		if (!isHost) {
-			return;
-		}
-		
-		// Create world.
-		new StaticBarrier();
-		fillWorld(world);
 		// Set the contact listener for the world, for collisions.
 		world.setContactListener(new MainGameContactListener());
+		
+		// Start the server.
+		try {
+			startServer();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void endContact(Contact contact) {
@@ -443,7 +561,7 @@ public class MainGame implements Screen {
 	 * 
 	 * @param world The world to fill
 	 */
-	public void fillWorld(World world){
+	public void fillWorld() {
 		for (int i = 0; i < Gdx.graphics.getWidth(); i = i + Constants.GROUND_SIZE) {
 			for (int j = 0; j < Gdx.graphics.getHeight(); j = j + Constants.GROUND_SIZE) {
 				new Ground(new Vector2(i + Utils.getCameraOffset().x, j + Utils.getCameraOffset().y));
