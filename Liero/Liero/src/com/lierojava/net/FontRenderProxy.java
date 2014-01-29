@@ -43,7 +43,7 @@ public class FontRenderProxy extends RenderProxy {
 	
 	@Override
 	public void render(SpriteBatch batch) {
-		BitmapFont font = Constants.FONTS.get(this.font);
+		BitmapFont font = Constants.SKIN.getFont(this.font);
 		if (center) {
 			TextBounds tb = font.getBounds(text);
 			position.x -= tb.width / 2;

@@ -21,7 +21,8 @@ public class HUD {
 		ArrayList<RenderProxy> proxies = new ArrayList<RenderProxy>();
 		
 		// Render the game time.
-		proxies.add(new FontRenderProxy(String.format("%.0f", GlobalState.currentGame.timeRemaining), "HUD_CLOCK", new Vector2(0, Gdx.graphics.getHeight() * 0.5f - 5), true));
+		proxies.add(new FontRenderProxy(String.format("%.0f", GlobalState.currentGame.timeRemaining), "font-hud-clock", new Vector2(0, Gdx.graphics.getHeight() * 0.5f - 5
+				), true));
 		
 		TextureRegion crosshairTexture = Constants.TEXTURES.findRegion("crosshair");
 		TextureRegion healthBorderTexture = Constants.TEXTURES.findRegion("health_border");
@@ -31,7 +32,7 @@ public class HUD {
 			Vector2 playerPosition = player.getBody().getPosition();
 			
 			// Player name.
-			proxies.add(new FontRenderProxy(player.stats.name, "HUD_PLAYERNAME", new Vector2(playerPosition.x, playerPosition.y + 36), true));
+			proxies.add(new FontRenderProxy(player.data.name, "font-hud-playername", new Vector2(playerPosition.x, playerPosition.y + 36), true));
 			
 			// Health bar.
 			proxies.add(new TextureRenderProxy("health_border", new Vector2(playerPosition.x - healthBorderTexture.getRegionWidth() / 2, playerPosition.y + healthBorderTexture.getRegionHeight() + 10)));

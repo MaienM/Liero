@@ -69,9 +69,9 @@ public class Player extends GameObject {
 	private Jetpack jetpack = new Jetpack(this);
 	
 	/**
-	 * The player's stats.
+	 * The player's data.
 	 */
-	public PlayerData stats = new PlayerData();
+	public PlayerData data = new PlayerData();
 	
 	/**
 	 * The playerstate enum. 
@@ -280,9 +280,9 @@ public class Player extends GameObject {
 	@Override
 	protected void die(Bullet bullet) {
 		if (this != bullet.player) {
-			bullet.player.stats.kills++;
+			bullet.player.data.kills++;
 		}
-		this.stats.deaths++;
+		this.data.deaths++;
 		spawn();
 	}
 	

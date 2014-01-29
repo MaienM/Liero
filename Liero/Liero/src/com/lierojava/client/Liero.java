@@ -12,15 +12,17 @@ import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import com.lierojava.Constants;
 import com.lierojava.Utils;
 import com.lierojava.enums.GameState;
+import com.lierojava.gameobjects.StaticBarrier;
+import com.lierojava.gui.HUD;
+import com.lierojava.gui.LobbyScreen;
+import com.lierojava.net.handles.HostServer;
 import com.lierojava.net.handles.ParticipantHost;
 import com.lierojava.net.handshake.HostHandshake;
 import com.lierojava.net.interfaces.IHostHandshake;
 import com.lierojava.net.interfaces.IParticipantHost;
 
 
-
 public class Liero extends Game implements ApplicationListener {
-	
 	
 	/**
 	 * The maingame.
@@ -40,6 +42,9 @@ public class Liero extends Game implements ApplicationListener {
 	
 	@Override
 	public void create() {
+		setScreen(new LobbyScreen(this));
+		
+		/*
 		game = GlobalState.currentGame = new MainGame();
 		GlobalState.gameState = GameState.GAME_PLAYING;
 		setScreen(GlobalState.currentGame);
@@ -58,7 +63,7 @@ public class Liero extends Game implements ApplicationListener {
 		
 		if (host != null) {
 			startClient();
-		}
+		}*/
 	}
 	
 	private void startServer() throws IOException {

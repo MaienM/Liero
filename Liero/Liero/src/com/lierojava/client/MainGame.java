@@ -10,7 +10,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -81,11 +80,6 @@ public class MainGame implements Screen {
 	 * The render proxies.
 	 */
 	public ArrayList<RenderProxy> renderProxies = new ArrayList<RenderProxy>();
-
-	/**
-	 * The background texture.
-	 */
-	private Texture backgroundTexture = new Texture(Gdx.files.internal("background.png"));
 	
 	/**
 	 * The IParticipantHost object, for communication to the host.
@@ -271,7 +265,7 @@ public class MainGame implements Screen {
 		batch.begin();
 		
 		// Draw the background.
-		batch.draw(backgroundTexture, -Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		batch.draw(Constants.TEXTURE_BACKGROUND, -Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		// Render game objects.
 		for (RenderProxy rp : renderProxies) {
@@ -303,8 +297,8 @@ public class MainGame implements Screen {
 		TextureRegion odd = Constants.TEXTURES.findRegion("background_score_odd");
 		
 		// Get the fonts.
-		BitmapFont headerFont = Constants.FONTS.get("SCORE_HEADER");
-		BitmapFont dataFont = Constants.FONTS.get("SCORE_DATA");
+		BitmapFont headerFont = Constants.SKIN.getFont("font-score-header");
+		BitmapFont dataFont = Constants.SKIN.getFont("font-score-data");
 		
 		// Get width and height.
 		int width = Gdx.graphics.getWidth();
@@ -427,7 +421,6 @@ public class MainGame implements Screen {
 			}
 			if (b.getUserData() == SimpleUserData.MARKED_FOR_REMOVAL) {
 				world.destroyBody(b);
-				Utils.print("Destroying body");
 			}
 		}
 	}	

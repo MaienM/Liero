@@ -1,11 +1,11 @@
 package com.lierojava;
 
-import java.util.HashMap;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public final class Constants {
 	/**
@@ -66,22 +66,41 @@ public final class Constants {
 	/**
 	 * The main textureatlas.
 	 */
-	public static TextureAtlas TEXTURES = new TextureAtlas(Gdx.files.internal("textures.pack"));
+	public static final TextureAtlas TEXTURES = new TextureAtlas(Gdx.files.internal("textures/textures.pack"));
 	
 	/**
-	 * The font map.
+	 * The main skin.
 	 */
-	@SuppressWarnings("serial")
-	public static HashMap<String, BitmapFont> FONTS = new HashMap<String, BitmapFont>() {{
+	public static final Skin SKIN = new Skin() {{	
+		// Insert fonts.
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Cousine-Regular-Latin.ttf"));
 		FreeTypeFontGenerator boldGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Cousine-Bold-Latin.ttf"));
-		put("HUD_PLAYERNAME", generator.generateFont(12)); 
-		put("HUD_CLOCK", generator.generateFont(36)); 
-		put("SCORE_HEADER", boldGenerator.generateFont(16));
-		put("SCORE_DATA", generator.generateFont(16));
+		add("default-font", generator.generateFont(14));
+		add("font-gui-window-title", generator.generateFont(50));
+		add("font-gui-window-title-small", generator.generateFont(30));
+		add("font-gui-dialog-title", generator.generateFont(20));
+		add("font-hud-playername", generator.generateFont(12)); 
+		add("font-hud-clock", generator.generateFont(36)); 
+		add("font-score-header", boldGenerator.generateFont(16));
+		add("font-score-data", generator.generateFont(16));
 		generator.dispose();
 		boldGenerator.dispose();
+		
+		// Load rest of the skin.
+		FileHandle skinFile = Gdx.files.internal("ui/skin.json");
+		FileHandle atlasFile = skinFile.sibling(skinFile.nameWithoutExtension() + ".atlas");
+		if (atlasFile.exists()) {
+			TextureAtlas atlas = new TextureAtlas(atlasFile);
+			addRegions(atlas);
+		}
+		load(skinFile);
 	}};
+	//public static Skin SKIN = new Skin(Gdx.files.internal("ui/skin.json"));
+	
+	/**
+	 * The background texture.
+	 */
+	public static final Texture TEXTURE_BACKGROUND = new Texture(Gdx.files.internal("textures/background.png"));
 	
 	/**
 	 * The scale of the crosshair on screen.
