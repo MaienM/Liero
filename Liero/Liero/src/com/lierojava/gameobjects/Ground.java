@@ -39,7 +39,7 @@ public class Ground extends GameObject {
 				
 		// Create the shape.
 		PolygonShape box = new PolygonShape();
-		box.setAsBox(Constants.GROUND_SIZE, Constants.GROUND_SIZE);
+		box.setAsBox(Constants.GROUND_SIZE / 2, Constants.GROUND_SIZE / 2);
 		
 		// Create the fixture.
 		body.createFixture(box, 0f);
@@ -52,7 +52,7 @@ public class Ground extends GameObject {
 	@Override
 	public ArrayList<RenderProxy> render() {
 		return new ArrayList<RenderProxy>() {{
-			add(new TextureRenderProxy("ground", body.getPosition(), new Vector2(Constants.GROUND_SIZE, Constants.GROUND_SIZE)));
+			add(new TextureRenderProxy("ground", body.getPosition(), new Vector2(Constants.GROUND_SIZE + 1, Constants.GROUND_SIZE + 1), 0, false, false, true));
 		}};
 	}
 
