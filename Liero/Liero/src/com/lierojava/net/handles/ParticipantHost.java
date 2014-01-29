@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.lierojava.client.GlobalState;
-import com.lierojava.net.RenderProxy;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
+import com.lierojava.render.RenderProxy;
 
 /**
  * The implementation for communication from the participant to the host.
@@ -86,13 +86,6 @@ public class ParticipantHost implements IParticipantHost {
 	public void chat(String message) {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	@Override
-	public void register(int index) {
-		/*
-		IHostParticipant ihp = ObjectSpace.getRemoteObject(connection, index, IHostParticipant.class);
-		GlobalState.currentGame.ihps.add(ihp);*/
 	}
 	
 	@SuppressWarnings("unchecked")

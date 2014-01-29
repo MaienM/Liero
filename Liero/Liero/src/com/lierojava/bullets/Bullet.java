@@ -11,9 +11,9 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.lierojava.Utils;
 import com.lierojava.client.GlobalState;
 import com.lierojava.gameobjects.GameObject;
-import com.lierojava.net.RenderProxy;
-import com.lierojava.net.TextureRenderProxy;
 import com.lierojava.participants.Player;
+import com.lierojava.render.RenderProxy;
+import com.lierojava.render.TextureRenderProxy;
 
 public abstract class Bullet extends GameObject {
 	/**

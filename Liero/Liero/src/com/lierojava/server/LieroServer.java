@@ -269,6 +269,7 @@ public class LieroServer {
 		for (HostStruct game : games) {
 			Utils.print(game.host + ":" + game.port + " > " + game.name);
 		}
+		
 		ihs.savePlayerStats(dbId, 10, 10);
 		
 		// Get the Chat object

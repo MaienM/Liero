@@ -98,13 +98,31 @@ public class LobbyScreen extends BaseScreen {
         btnJoin.addListener(new ClickListener(){
             @Override 
             public void clicked(InputEvent event, float x, float y) {
-            	if (listGames.getSelectedIndex() < 0) {
+            	if (listGames.getSelectedIndex() < 0 || games.isEmpty()) {
             		showDialog("Select a game", "You must first select a game to join");
             		return;
             	}
             	
-            	// TODO: Port.
-            	game.setScreen(new MainGame(game, games.get(listGames.getSelectedIndex()).host));
+            	HostStruct host = games.get(listGames.getSelectedIndex());
+            	game.setScreen(new WeaponScreen(game, host.host, host.port));
+            }
+        });
+        
+        // Spectate button.
+    	final TextButton btnSpectate = new TextButton("Spectate", Constants.SKIN);
+        tblRight.add(btnSpectate).fill();
+        tblRight.row();
+        
+        btnSpectate.addListener(new ClickListener(){
+            @Override 
+            public void clicked(InputEvent event, float x, float y) {
+            	if (listGames.getSelectedIndex() < 0 || games.isEmpty()) {
+            		showDialog("Select a game", "You must first select a game to spectate");
+            		return;
+            	}
+            	
+            	HostStruct host = games.get(listGames.getSelectedIndex());
+            	game.setScreen(new MainGame(game, host.host, host.port, null));
             }
         });
         
@@ -117,7 +135,7 @@ public class LobbyScreen extends BaseScreen {
             @Override 
             public void clicked(InputEvent event, float x, float y){
             	// TODO: Weapon select screen first.
-				game.setScreen(new MainGame(game, null));
+				game.setScreen(new WeaponScreen(game, null, -1));
             }
         });
         

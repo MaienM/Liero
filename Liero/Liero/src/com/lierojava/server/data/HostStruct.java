@@ -24,14 +24,10 @@ public class HostStruct {
 	/**
 	 * The main constructor for this HostStruct object
 	 * 
-	 * @param host The host where the game is running
-	 * 
 	 * @param port The port where the game is running
-	 * 
-	 * @param name The name where the game is running
+	 * @param name The name of the game
 	 */
-	public HostStruct(String host, int port, String name) {
-		this.host = host;
+	public HostStruct(int port, String name) {
 		this.port = port;
 		this.name = name;
 	}

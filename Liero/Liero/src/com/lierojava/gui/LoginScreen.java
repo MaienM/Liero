@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -45,6 +47,7 @@ public class LoginScreen extends BaseScreen {
     	// Text fields.
     	final TextField tbUsername = new TextField("", Constants.SKIN);
     	tbUsername.setMessageText("Username");
+    	stage.setKeyboardFocus(tbUsername);
     	table.add(tbUsername).fill();
     	table.row();
     	
@@ -54,6 +57,20 @@ public class LoginScreen extends BaseScreen {
     	tbPassword.setPasswordMode(true);
     	table.add(tbPassword).fill();
     	table.row();
+    	
+    	// Enter key.
+    	InputListener enterListener = new InputListener() {
+    		@Override
+    		public boolean keyUp(InputEvent event, int keycode) {
+				if (keycode == Keys.ENTER) {
+					login(tbUsername.getText(), tbPassword.getText());
+				}
+				return false;
+			}
+    	};
+    	
+    	tbUsername.addListener(enterListener);
+    	tbPassword.addListener(enterListener);
     	
     	// Spacer.
     	table.add().height(4);
@@ -89,7 +106,7 @@ public class LoginScreen extends BaseScreen {
     
     private boolean validate(String username, String password) {
     	if (username.isEmpty() || password.isEmpty()) {
-    		showDialog("Username/password empty", "The have to enter an username and password.");
+    		showDialog("Username/password empty", "You have to enter an username and password.");
     		return false;
     	}
     	return true;
@@ -139,7 +156,7 @@ public class LoginScreen extends BaseScreen {
 		// We failed to login
 		else  {
 			kryoClient.close();
-			showDialog("Invalid username/password", "The entered username and/or password are not known.");
+			showDialog("Login failed", "The entered username and/or password are not known, or you are already logged in elsewhere.");
 		}
 	}
 

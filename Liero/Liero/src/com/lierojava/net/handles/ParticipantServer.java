@@ -1,13 +1,16 @@
 package com.lierojava.net.handles;
 
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
+import com.esotericsoftware.kryonet.Connection;
 import com.lierojava.Utils;
 import com.lierojava.net.interfaces.IHostServer;
 import com.lierojava.net.interfaces.IParticipantChat;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.server.GlobalServerState;
 import com.lierojava.server.data.HostStruct;
+import com.lierojava.server.database.Account;
 
 /**
  * The implementation for communication from the participant to the server.
@@ -62,6 +65,13 @@ public class ParticipantServer implements IParticipantServer {
 	public int addGame(HostStruct game) {
 		if (GlobalServerState.accountGame.containsKey(this.databaseId)) {
 			return -1;
+		}
+		// Determine the host.
+		for (Entry<Connection, Account> entry : GlobalServerState.connectionAccounts.entrySet()) {
+			if (entry.getValue().getId() == this.databaseId) {
+				game.host = entry.getKey().getRemoteAddressTCP().getAddress().getHostAddress();
+				Utils.print(game.host);
+			}
 		}
 		GlobalServerState.accountGame.put(this.databaseId, game);
 		int ihpId = this.databaseId + (Integer.MAX_VALUE / 2);

@@ -1,4 +1,4 @@
-package com.lierojava.net;
+package com.lierojava.render;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

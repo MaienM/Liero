@@ -9,7 +9,6 @@ import com.lierojava.server.GlobalServerState;
  * @author Michon
  */
 public class HostServer implements IHostServer {
-	
 	/**
 	 * Checks whether a player with dbId is actually logged in
 	 */
@@ -25,5 +24,4 @@ public class HostServer implements IHostServer {
 	public void savePlayerStats(int dbId, int kills, int deaths) {
 		GlobalServerState.server.savePlayerStats(dbId, kills, deaths);
 	}
-
 }

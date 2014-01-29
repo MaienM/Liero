@@ -18,7 +18,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.Client;
@@ -36,27 +39,23 @@ import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.BaseScreen;
 import com.lierojava.gui.HUD;
 import com.lierojava.gui.LobbyScreen;
-import com.lierojava.net.RenderProxy;
 import com.lierojava.net.handles.ParticipantHost;
 import com.lierojava.net.handshake.HostHandshake;
 import com.lierojava.net.interfaces.IHostHandshake;
 import com.lierojava.net.interfaces.IHostServer;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
+import com.lierojava.render.RenderProxy;
 import com.lierojava.server.data.HostStruct;
 import com.lierojava.userdata.PendingAction;
 import com.lierojava.userdata.SimpleUserData;
+import com.lierojava.weapons.Weapon;
 
 public class MainGame extends BaseScreen {
 	/**
 	 * The Box2D world.
 	 */
 	public World world;
-	
-	/**
-	 * The stats.
-	 */
-	public HashMap<Integer, PlayerData> stats = new HashMap<Integer, PlayerData>();
 	
 	/**
 	 * Debug crap.
@@ -80,10 +79,25 @@ public class MainGame extends BaseScreen {
 	public ArrayList<Player> players = new ArrayList<Player>();
 	
 	/**
+	 * The scores.
+	 */
+	public HashMap<Integer, PlayerData> scores = new HashMap<Integer, PlayerData>();
+	
+	/**
 	 * The host. 
 	 * If this is null it means we are the host.
 	 */
-	public String host;
+	private String host;
+	
+	/**
+	 * The port.
+	 */
+	private int port;
+	
+	/**
+	 * The desired weapons.
+	 */
+	private ArrayList<Class<? extends Weapon>> weapons;
 
 	/**
 	 * Renders sprites.
@@ -113,7 +127,7 @@ public class MainGame extends BaseScreen {
 	/**
 	 * How much time is remaining before the round ends.
 	 */
-	public float timeRemaining = 300;
+	public float timeRemaining = Constants.GAME_DURATION;
 	
 	/**
 	 * The key handlers.
@@ -130,7 +144,7 @@ public class MainGame extends BaseScreen {
 	/**
 	 * Create a new game.
 	 */
-	public MainGame(Game game, String host) {
+	public MainGame(Game game, String host, int port, ArrayList<Class<? extends Weapon>> weapons) {
 		super(game);
 		
 		// Update global state.
@@ -138,6 +152,8 @@ public class MainGame extends BaseScreen {
 		
 		// Save host info.
 		this.host = host;
+		this.port = port;
+		this.weapons = weapons;
 		
 		// Create a new sprite batch.
 		this.batch = new SpriteBatch();
@@ -177,7 +193,7 @@ public class MainGame extends BaseScreen {
 		GlobalState.objectSpace.register(0, ihh);
 		
 		// Get an IParticipantHost object for the local player.
-		ihh.requestParticipant(true, 0);
+		ihh.requestParticipant(true, GlobalState.ips.getDatabaseId(), weapons);
 		iph = new ParticipantHost(players.get(0));
 		
 		// Connect to the global server.
@@ -187,8 +203,7 @@ public class MainGame extends BaseScreen {
 		}
 		
 		// Register the host.
-		// TODO: Remove hardcoded values.
-		HostStruct hs = new HostStruct("127.0.0.1", Constants.PORT, "Liero Game");
+		HostStruct hs = new HostStruct(Constants.PORT, GlobalState.ips.getName());
 		int ihsId = GlobalState.ips.addGame(hs);
 		
 		if (ihsId == -1) {
@@ -210,7 +225,7 @@ public class MainGame extends BaseScreen {
 		Utils.setupKryo(client.getKryo());
 		client.start();
 		try {
-			client.connect(5000, host, Constants.PORT, Constants.PORT);
+			client.connect(5000, host, port, port);
 		} catch (IOException e) {
 			BaseScreen screen = new LobbyScreen(game);
 			screen.showDialog("Port in use", "The port Liero uses for hosting servers is already in use. Are you already running a server? Aborting.");
@@ -220,7 +235,7 @@ public class MainGame extends BaseScreen {
 		client.setTimeout(0);
 
 		IHostHandshake ihh = ObjectSpace.getRemoteObject(client, 0, IHostHandshake.class);
-		int index = ihh.requestParticipant(true, 1);
+		int index = ihh.requestParticipant(weapons != null, GlobalState.ips.getDatabaseId(), weapons);
 		if (index > 0) {
 			iph = ObjectSpace.getRemoteObject(client, index, IParticipantHost.class);
 		}
@@ -241,6 +256,7 @@ public class MainGame extends BaseScreen {
 				update();
 			} 
 			else {
+				// TODO: Nullpointer for spectators.
 				ArrayList<RenderProxy> newRenderProxies = iph.getRenderProxies();
 				if (newRenderProxies != null) {
 					renderProxies = newRenderProxies;
@@ -249,13 +265,13 @@ public class MainGame extends BaseScreen {
 			
 			// Render. 
 			render();
-		}
-		else if (timeRemaining > -10) {
-			showScore = true;
-			render();
+		} 
+		else {
+			update();
+			super.render(delta);
 		}
 	}
-	
+
 	/**
 	 * Process user input.
 	 */
@@ -394,8 +410,8 @@ public class MainGame extends BaseScreen {
 		if (debug) {
 			debugRenderer.render(world, camera.combined);
 		}
-	}
-
+	}			
+	
 	/**
 	 * Render the score.
 	 * @param batch The spritebatch to use for rendering
@@ -422,7 +438,7 @@ public class MainGame extends BaseScreen {
 		
 		// Draw the scores.
 		int i = 0;
-		for (Entry<Integer, PlayerData> entry : stats.entrySet()) {
+		for (Entry<Integer, PlayerData> entry : scores.entrySet()) {
 			batch.draw(i % 2 == 0 ? even : odd, width * -0.4f + 16, height * 0.4f - 60 - 20 * i, width * 0.8f - 32, 20);
 			dataFont.draw(batch, entry.getValue().name, width * -0.4f + 20, height * 0.4f - 44 - 20 * i);
 			dataFont.draw(batch, entry.getValue().kills + "", width * 0.2f, height * 0.4f - 44 - 20 * i);
@@ -430,10 +446,14 @@ public class MainGame extends BaseScreen {
 			
 			i++;
 		}
-	}					
+	}		
 
 	@Override
 	public void show() {
+		// Setup GUI.
+		super.show(1024);
+		setupUI();
+		
 		// Create the camera.
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
@@ -458,7 +478,26 @@ public class MainGame extends BaseScreen {
 		debugRenderer.setDrawVelocities(false);
 		
 		// Set the contact listener for the world, for collisions.
-		world.setContactListener(new MainGameContactListener());
+		world.setContactListener(new ContactListener() {	
+			@Override
+			public void beginContact(Contact contact) {}
+
+			@Override
+			/**
+			 * On contact between two fixtures.
+			 * 
+			 * @param contact The contact.
+			 */
+			public void endContact(Contact contact) {
+				GlobalState.currentGame.endContact(contact);
+			}	
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {}
+		});
 		
 		// Start the server.
 		try {
@@ -467,6 +506,13 @@ public class MainGame extends BaseScreen {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		// Handle all input.
+		Gdx.input.setInputProcessor(stage);
+	}
+	
+	private void setupUI() {
+		
 	}
 	
 	public void endContact(Contact contact) {

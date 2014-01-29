@@ -24,6 +24,11 @@ public final class Constants {
 	public static final String SERVER_HOST = "127.0.0.1";
 	
 	/**
+	 * The game duration, in seconds.
+	 */
+	public static final int GAME_DURATION = 6;
+	
+	/**
 	 * Conversion from screen units to Box2D units.
 	 */
 	public static final float WORLD_TO_BOX = 0.01f;
@@ -78,7 +83,9 @@ public final class Constants {
 		add("default-font", generator.generateFont(14));
 		add("font-gui-window-title", generator.generateFont(50));
 		add("font-gui-window-title-small", generator.generateFont(30));
-		add("font-gui-dialog-title", generator.generateFont(20));
+		add("font-gui-dialog-title", generator.generateFont(40));
+		add("font-gui-dialog-text", generator.generateFont(30));
+		add("font-gui-dialog-button", generator.generateFont(24));
 		add("font-hud-playername", generator.generateFont(12)); 
 		add("font-hud-clock", generator.generateFont(36)); 
 		add("font-score-header", boldGenerator.generateFont(16));

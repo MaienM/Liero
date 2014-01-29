@@ -8,10 +8,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.lierojava.Constants;
 import com.lierojava.Utils;
 import com.lierojava.client.GlobalState;
-import com.lierojava.net.FontRenderProxy;
-import com.lierojava.net.RenderProxy;
-import com.lierojava.net.TextureRenderProxy;
 import com.lierojava.participants.Player;
+import com.lierojava.render.FontRenderProxy;
+import com.lierojava.render.RenderProxy;
+import com.lierojava.render.TextureRenderProxy;
 
 public class HUD {	
 	public HUD() {

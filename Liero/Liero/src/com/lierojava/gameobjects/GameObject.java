@@ -3,7 +3,7 @@ package com.lierojava.gameobjects;
 import java.util.ArrayList;
 
 import com.lierojava.bullets.Bullet;
-import com.lierojava.net.RenderProxy;
+import com.lierojava.render.RenderProxy;
 
 public abstract class GameObject {
 	/**

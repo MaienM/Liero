@@ -1,4 +1,4 @@
-package com.lierojava.net;
+package com.lierojava.render;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
@@ -44,11 +44,13 @@ public class FontRenderProxy extends RenderProxy {
 	@Override
 	public void render(SpriteBatch batch) {
 		BitmapFont font = Constants.SKIN.getFont(this.font);
+		Vector2 pos = position;
 		if (center) {
 			TextBounds tb = font.getBounds(text);
-			position.x -= tb.width / 2;
-			position.y -= tb.height / 2;
+			pos = new Vector2(position);
+			pos.x -= tb.width / 2;
+			pos.y -= tb.height / 2;
 		}
-		font.draw(batch, text, position.x, position.y);
+		font.draw(batch, text, pos.x, pos.y);
 	}
 }

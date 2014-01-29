@@ -1,5 +1,6 @@
 package com.lierojava.participants;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -20,14 +21,11 @@ import com.lierojava.client.GlobalState;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
-import com.lierojava.net.RenderProxy;
-import com.lierojava.net.TextureRenderProxy;
+import com.lierojava.render.RenderProxy;
+import com.lierojava.render.TextureRenderProxy;
 import com.lierojava.userdata.PendingAction;
 import com.lierojava.userdata.SimpleUserData;
-import com.lierojava.weapons.Grenade;
 import com.lierojava.weapons.Jetpack;
-import com.lierojava.weapons.Pistol;
-import com.lierojava.weapons.Shotgun;
 import com.lierojava.weapons.Weapon;
 
 public class Player extends GameObject {
@@ -98,16 +96,30 @@ public class Player extends GameObject {
 	 */
 	public Thread showWeaponThread;
 	
-	public Player(int playerID) {
+	public Player(int playerID, ArrayList<Class<? extends Weapon>> weapons) {
 		this.playerID = playerID;
 		
 		// Set the weapons.
-		weapons = new ArrayList<Weapon>();
-		weapons.add(new Pistol(this));
-		weapons.add(new Shotgun(this));
-		weapons.add(new Grenade(this));
-
-		currentWeapon = weapons.get(0);
+		this.weapons = new ArrayList<Weapon>();
+		for (Class<? extends Weapon> wc : weapons) {
+			try {
+				this.weapons.add(wc.getConstructor(Player.class).newInstance(this));
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+		}
+		Utils.print(this.weapons);
+		currentWeapon = this.weapons.get(0);
 	
 		// Create the body.
 		BodyDef bodyDef = new BodyDef();

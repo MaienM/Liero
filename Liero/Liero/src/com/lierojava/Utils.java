@@ -27,7 +27,6 @@ import com.lierojava.bullets.Bullet;
 import com.lierojava.bullets.PistolBullet;
 import com.lierojava.client.GlobalState;
 import com.lierojava.client.MainGame;
-import com.lierojava.client.MainGameContactListener;
 import com.lierojava.enums.GameState;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.StaticBarrier;
@@ -51,9 +50,6 @@ import com.lierojava.userdata.SimpleUserData;
 import com.lierojava.weapons.Jetpack;
 import com.lierojava.weapons.Pistol;
 import com.lierojava.weapons.Weapon;
-
-
-
 
 public class Utils {
 	/**
@@ -89,7 +85,6 @@ public class Utils {
 		Bullet.class,
 		PistolBullet.class,
 		MainGame.class,
-		MainGameContactListener.class,
 		HUD.class,
 		
 		ArrayList.class,

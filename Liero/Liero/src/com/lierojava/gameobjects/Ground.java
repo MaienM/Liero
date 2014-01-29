@@ -11,8 +11,8 @@ import com.lierojava.Constants;
 import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.client.GlobalState;
-import com.lierojava.net.RenderProxy;
-import com.lierojava.net.TextureRenderProxy;
+import com.lierojava.render.RenderProxy;
+import com.lierojava.render.TextureRenderProxy;
 import com.lierojava.userdata.SimpleUserData;
 
 public class Ground extends GameObject {

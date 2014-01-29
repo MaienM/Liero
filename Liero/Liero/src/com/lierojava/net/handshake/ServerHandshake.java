@@ -43,5 +43,4 @@ public class ServerHandshake implements IServerHandshake {
 		}
 		return AccountState.FAILURE;
 	}
-
 }

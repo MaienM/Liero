@@ -11,8 +11,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.lierojava.Constants;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.client.GlobalState;
-import com.lierojava.net.RenderProxy;
-import com.lierojava.net.TextureRenderProxy;
+import com.lierojava.render.RenderProxy;
+import com.lierojava.render.TextureRenderProxy;
 
 public class StaticBarrier extends GameObject {
 	/**

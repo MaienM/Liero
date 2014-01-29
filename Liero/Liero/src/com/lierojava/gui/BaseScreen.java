@@ -2,16 +2,22 @@ package com.lierojava.gui;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.esotericsoftware.kryonet.Client;
 import com.lierojava.Constants;
 import com.lierojava.Utils;
@@ -20,12 +26,12 @@ public abstract class BaseScreen implements Screen {
 	/**
 	 * The spritebatch, for rendering.
 	 */
-    private SpriteBatch batch;
+    protected SpriteBatch batch;
     
     /**
      * The stage for this ui.
      */
-    private Stage stage;
+    protected Stage stage;
     
     /**
      * The main layout table.
@@ -75,7 +81,7 @@ public abstract class BaseScreen implements Screen {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
         
-        stage.act();
+        stage.act(delta);
         batch.begin();
         stage.draw();
         batch.end();
@@ -113,22 +119,31 @@ public abstract class BaseScreen implements Screen {
      * @param text The dialog text.
      * @param buttons The buttons to show.
      */
-    public void showDialog(String title, String text, String... buttons) {
-    	// TODO: Scale the dialog properly.
+    public void showDialog(String title, String text, String... buttons) {    	
+    	// Create the dialog.
     	Dialog d = new Dialog(title, Constants.SKIN) {
-			{
-				this.setBounds(Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight() / 4, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-			}
-			
 			@Override
 			protected void result(Object obj) {
 				this.setVisible(false);
 			}
 		};
-		d.text(text);
+		
+		// Create the label.
+		text = WordUtils.wrap(text, 30);
+		LabelStyle textStyle = Constants.SKIN.get("label-dialog", LabelStyle.class);
+		d.text(new Label(text, textStyle));
+		
+		// Add the buttons.
 		for (int i = 0; i < buttons.length; i++) {
-			d.button(buttons[i], i);
+			TextButton b = new TextButton(buttons[i], Constants.SKIN, "dialog");
+			d.button(b, i);
 		}
+		
+		// Set the size.
+		TextBounds size = textStyle.font.getMultiLineBounds(text);
+		size.width = Math.max(size.width, d.getTitleWidth());
+		d.setBounds((Gdx.graphics.getWidth() - size.width - 20) / 2 , (Gdx.graphics.getHeight() - size.height - 120) / 2, size.width + 20, size.height + 120);
+		
 		stage.addActor(d);
     }
     

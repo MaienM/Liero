@@ -2,8 +2,8 @@ package com.lierojava.net.interfaces;
 
 import java.util.ArrayList;
 
-import com.lierojava.net.RenderProxy;
 import com.lierojava.participants.Player;
+import com.lierojava.render.RenderProxy;
 
 /**
  * The interface for communication from the participant to the host.
@@ -65,12 +65,6 @@ public interface IParticipantHost {
 	 * TODO: @see this.
 	 */
 	public abstract void chat(String message);
-	
-	/**
-	 * Notify the host that you have an IHostParticipant object waiting for him.
-	 * @param index The index of the object.
-	 */
-	public abstract void register(int index);
 
 	/**
 	 * Get the render proxies.
