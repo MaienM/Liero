@@ -55,6 +55,8 @@ public abstract class Bullet extends GameObject {
 	 * @param angle The angle at which the bullet is fired.
 	 */
 	protected void spawnBullet(Vector2 start, float angle) {
+		//Wait till the world is available
+		while(GlobalState.currentGame.world.isLocked());
 		// Create the body.
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;

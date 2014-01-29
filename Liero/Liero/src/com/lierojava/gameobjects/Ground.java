@@ -8,7 +8,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.lierojava.Constants;
-import com.lierojava.Utils;
 import com.lierojava.bullets.Bullet;
 import com.lierojava.client.GlobalState;
 import com.lierojava.render.RenderProxy;
@@ -58,7 +57,6 @@ public class Ground extends GameObject {
 
 	@Override
 	protected void die(Bullet bullet) {
-		Utils.print("Marked ground ready for removal");
 		body.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 	}
 }

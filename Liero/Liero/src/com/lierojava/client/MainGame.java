@@ -55,7 +55,7 @@ public class MainGame extends BaseScreen {
 	/**
 	 * The Box2D world.
 	 */
-	public World world;
+	public volatile World world;
 	
 	/**
 	 * Debug crap.
@@ -352,8 +352,11 @@ public class MainGame extends BaseScreen {
 		// Update the time remaining.
 		timeRemaining -= Gdx.graphics.getDeltaTime();
 		
+		synchronized(this) {
 		// Perform a physics step.
 		world.step(1f/30f, 8, 3);
+		while(world.isLocked());
+		}
 		
 		// Perform pending actions.
 		executeActions();
@@ -583,7 +586,7 @@ public class MainGame extends BaseScreen {
 			if (world.isLocked()) {
 				break;
 			}
-			if (b.getUserData() == SimpleUserData.MARKED_FOR_REMOVAL) {
+			if (b.getUserData() == SimpleUserData.MARKED_FOR_REMOVAL && !world.isLocked()) {
 				world.destroyBody(b);
 			}
 		}

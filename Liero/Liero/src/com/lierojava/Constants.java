@@ -26,7 +26,7 @@ public final class Constants {
 	/**
 	 * The game duration, in seconds.
 	 */
-	public static final int GAME_DURATION = 6;
+	public static final int GAME_DURATION = 600;
 	
 	/**
 	 * Conversion from screen units to Box2D units.
@@ -143,4 +143,9 @@ public final class Constants {
 	 * The length of the password salt
 	 */
 	public static final int SALT_LENGTH = 32;
+	
+	/**
+	 * The time to protect a player after spawning in ms
+	 */
+	public static final int SPAWN_PROTECTION_TIME = 500;
 }

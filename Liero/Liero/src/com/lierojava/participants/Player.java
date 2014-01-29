@@ -71,6 +71,8 @@ public class Player extends GameObject {
 	 */
 	public PlayerData data = new PlayerData();
 	
+	private long lastSpawntime = 0;
+	
 	/**
 	 * The playerstate enum. 
 	 */
@@ -151,6 +153,7 @@ public class Player extends GameObject {
 	 * Render the player.
 	 * @return 
 	 */
+	@Override
 	@SuppressWarnings({ "incomplete-switch", "serial" })
 	public ArrayList<RenderProxy> render() {
 		final TextureRenderProxy rp = new TextureRenderProxy();
@@ -302,9 +305,11 @@ public class Player extends GameObject {
 	 * (Re)spawn the player.
 	 */
 	private void spawn() {
+		this.lastSpawntime = System.currentTimeMillis();
 		new PendingAction(body) {			
 			@Override
 			public void run() {
+				
 				health = 100;
 				
 				Random r = new Random();
@@ -315,7 +320,12 @@ public class Player extends GameObject {
 				
 				// Remove any ground objects the player would collide with on spawn
 				// Perform microstep to calculate collisions of the newly created player
-				GlobalState.currentGame.world.step(1f/120f, 8, 3);
+				while(GlobalState.currentGame.world.isLocked());
+				
+				synchronized(this) {
+					GlobalState.currentGame.world.step(1f/120f, 8, 3);
+					while(GlobalState.currentGame.world.isLocked());
+					}
 				for (Contact c : Utils.getContacts(body)) {
 					if (c.getFixtureA().getBody().getUserData() instanceof Ground) {
 						Body fa = c.getFixtureA().getBody();
@@ -376,5 +386,15 @@ public class Player extends GameObject {
 	 */
 	public int getHealth() {
 		return health; 
+	}
+	
+	/**
+	 * Override to enable spawn protection
+	 */
+	@Override
+	public void damage(Bullet bullet) {
+		if (this.lastSpawntime + Constants.SPAWN_PROTECTION_TIME <= System.currentTimeMillis()) {
+			super.damage(bullet);
+		}
 	}
 }
