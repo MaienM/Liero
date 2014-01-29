@@ -129,6 +129,7 @@ public class Player extends GameObject {
 		bodyDef.fixedRotation = true;
 		body = GlobalState.currentGame.world.createBody(bodyDef);
 		body.setUserData(this);
+		body.setGravityScale(3.0f);
 				
 		// Create the player shape.
 		PolygonShape box = new PolygonShape();

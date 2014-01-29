@@ -7,7 +7,7 @@ import com.lierojava.participants.Player;
 public class Shotgun extends Weapon {
 	public Shotgun() {
 		maxCharge = 1;
-		regenSpeed = 2f;
+		regenSpeed = 1.5f;
 		knockbackForce = 3f;
 		fireRate = 0.1f;
 		fireSound = Gdx.audio.newSound(Gdx.files.internal("sounds/shotgun.mp3"));

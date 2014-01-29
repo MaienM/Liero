@@ -8,7 +8,7 @@ public class GrenadeBullet extends Bullet {
 	public GrenadeBullet() {
 		size = new Vector2(4, 4);
 		speed = 20;
-		health = 15;
+		health = 20;
 		textureRegion = "grenade";
 	}
 	

@@ -6,7 +6,7 @@ public class PistolBullet extends Bullet {
 	public PistolBullet() {
 		size = new Vector2(2, 2);
 		speed = 3;
-		health = 20;
+		health = 40;
 		textureRegion = "bullet";
 	}
 }
