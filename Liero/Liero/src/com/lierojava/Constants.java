@@ -148,4 +148,9 @@ public final class Constants {
 	 * The time to protect a player after spawning in ms
 	 */
 	public static final int SPAWN_PROTECTION_TIME = 500;
+	
+	/**
+	 * Rocket blast radius.
+	 */
+	public static final int BLAST_RADIUS = GROUND_SIZE * 3;
 }

@@ -45,7 +45,7 @@ public class WeaponScreen extends BaseScreen {
 		show(1200);
 		
 		// Title.
-		table.add(new Label("Pick 3", Constants.SKIN, "label-title")).colspan(9).fillY().expandY();
+		table.add(new Label("Pick 3", Constants.SKIN, "label-title")).colspan(11).fillY().expandY();
 		table.row();
 		
 		// HSpacer.
@@ -118,11 +118,11 @@ public class WeaponScreen extends BaseScreen {
 		table.row();		
 		
 		// VSpacer.
-    	table.add().colspan(4).fillY().expandY();
+    	table.add().colspan(3).fillY().expandY();
 		
 		// Start button.
     	final TextButton btnStart = new TextButton("Start", Constants.SKIN);
-        table.add(btnStart).colspan(3).fillX().height(screen.y / 10);
+        table.add(btnStart).colspan(5).fillX().height(screen.y / 10);
         
         btnStart.addListener(new ClickListener(){
             @Override 

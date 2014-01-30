@@ -69,6 +69,7 @@ public abstract class Bullet extends GameObject {
 		bodyDef.position.set(start);
 		bodyDef.bullet = true;
 		bodyDef.gravityScale = gravity;
+		bodyDef.angle = angle;
 		Body body = GlobalState.currentGame.world.createBody(bodyDef);
 		body.setUserData(this);
 		bodies.add(body);

@@ -171,6 +171,13 @@ player3
   orig: 11, 13
   offset: 0, 0
   index: -1
+rocket
+  rotate: false
+  xy: 128, 0
+  size: 12, 6
+  orig: 12, 6
+  offset: 0, 0
+  index: -1
 grenade
   rotate: false
   xy: 139, 9
@@ -183,6 +190,13 @@ bullet
   xy: 30, 14
   size: 5, 5
   orig: 5, 5
+  offset: 0, 0
+  index: -1
+laser
+  rotate: false
+  xy: 147, 13
+  size: 6, 6
+  orig: 6, 6
   offset: 0, 0
   index: -1
 background_score

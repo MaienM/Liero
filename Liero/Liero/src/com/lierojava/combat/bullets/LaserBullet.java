@@ -8,6 +8,6 @@ public class LaserBullet extends Bullet {
 		speed = 50;
 		gravity = 0;
 		health = 5;
-		textureRegion = "bullet";
+		textureRegion = "laser";
 	}
 }
