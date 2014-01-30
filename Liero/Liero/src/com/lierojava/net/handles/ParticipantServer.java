@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.lierojava.Utils;
 import com.lierojava.net.interfaces.IHostServer;
-import com.lierojava.net.interfaces.IParticipantChat;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.server.GlobalServerState;
 import com.lierojava.server.data.HostStruct;
@@ -17,7 +15,7 @@ import com.lierojava.server.database.Account;
  * 
  * @author Michon
  */
-public class ParticipantServer implements IParticipantServer {
+public class ParticipantServer extends Chat implements IParticipantServer {
 	/*
 	 * The database id of the player
 	 */
@@ -31,7 +29,9 @@ public class ParticipantServer implements IParticipantServer {
 	/**
 	 * Kryonet no-arg constructor
 	 */
-	public ParticipantServer() {};
+	public ParticipantServer() {
+		super(true);
+	}
 	
 	/**
 	 * Main constructor
@@ -41,6 +41,7 @@ public class ParticipantServer implements IParticipantServer {
 	 * @param db The database Id of the player belonging to this instance
 	 */
 	public ParticipantServer(int dbid, String name) {
+		this();
 		this.databaseId = dbid;
 		this.name = name;
 	}
@@ -70,14 +71,12 @@ public class ParticipantServer implements IParticipantServer {
 		for (Entry<Connection, Account> entry : GlobalServerState.connectionAccounts.entrySet()) {
 			if (entry.getValue().getId() == this.databaseId) {
 				game.host = entry.getKey().getRemoteAddressTCP().getAddress().getHostAddress();
-				Utils.print(game.host);
 			}
 		}
 		GlobalServerState.accountGame.put(this.databaseId, game);
 		int ihpId = this.databaseId + (Integer.MAX_VALUE / 2);
 		IHostServer ihs = new HostServer();
 		GlobalServerState.serverObjectSpace.register(ihpId, ihs);
-		Utils.print("Game Added:" + game.host);
 		return ihpId;
 	}
 	
@@ -94,12 +93,9 @@ public class ParticipantServer implements IParticipantServer {
 	public String getName() {
 		return this.name;
 	}
-
+	
 	@Override
-	public int getChatInstance() {
-		IParticipantChat ipc = new ParticipantChat(true);
-		int index = (int) (this.databaseId + Math.ceil(Integer.MAX_VALUE * 0.25));
-		GlobalServerState.serverObjectSpace.register(index, ipc);
-		return index;
+	public void sendMessage(String message) {
+		super.sendMessage(this.name + "> " + message);
 	}
 }

@@ -9,7 +9,7 @@ import com.lierojava.server.data.HostStruct;
  * 
  * @author Michon
  */
-public interface IParticipantServer {
+public interface IParticipantServer extends IChat {
 
 	/**
 	 * Adds a game to the current game list
@@ -37,11 +37,4 @@ public interface IParticipantServer {
 	 * @return String the name
 	 */
 	public String getName();
-
-	/**
-	 * Gets the index of the chat object for this player
-	 * 
-	 * @return the index of the chat object
-	 */
-	public int getChatInstance();
 }

@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -79,7 +78,6 @@ public class LieroServer {
 			@Override
 			public void connected(final Connection connection) {
 				GlobalServerState.serverObjectSpace.addConnection(connection);
-				Utils.print(connection.getID());
 				if (connection.getRemoteAddressTCP().getAddress() == null) {
 					connection.close();
 				}
@@ -177,7 +175,6 @@ public class LieroServer {
 			
 			// Check if this account is already logged in
 			for (Entry<Connection, Account> entry :  GlobalServerState.connectionAccounts.entrySet()) {
-				Utils.print(entry.getValue().getName());
 				if (entry.getValue().getName().equals(username)) {
 					return -1;
 				}
@@ -185,7 +182,6 @@ public class LieroServer {
 			
 			// Actually check the credentials
 			Account loginAccount = accounts.get(0);
-			Utils.print(loginAccount.getKills()  + "  :  " + loginAccount.getDeaths());
 			if (loginAccount.isCorrectPassword(password)) {
 				IParticipantServer ips = new ParticipantServer(loginAccount.getId(), loginAccount.getName());
 				GlobalServerState.serverObjectSpace.register(loginAccount.getId(), ips);
@@ -254,42 +250,5 @@ public class LieroServer {
 		return false;
 	}
 	
-	/**
-	 * Tests all required client and host functionality
-	 * @param kryoClient The client to test with
-	 * @param dbId the dbId to test with
-	 * 
-	 * TODO: remove
-	 */
-	private void testClientFunctionality(Client kryoClient, int dbId) {
-		/*
-		
-		//Fetch games, print them and then increase the kills and deaths of this player by 10
-		ArrayList<HostStruct> games = GlobalServerState.ips.getGames();
-		for (HostStruct game : games) {
-			Utils.print(game.host + ":" + game.port + " > " + game.name);
-		}
-		
-		ihs.savePlayerStats(dbId, 10, 10);
-		
-		// Get the Chat object
-		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message1");
-		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message2");
-		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message3");
-		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message4");
-		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message5");
-		ArrayList<String> messages = GlobalServerState.ipc.getNewMessages();
-		Utils.print("Gotmessages");
-		for (String message : messages) {
-			Utils.print(message);
-		}
-		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message6");
-		GlobalServerState.ipc.sendMessage(GlobalServerState.ips.getName() + ":" + "Message7");
-		messages = GlobalServerState.ipc.getNewMessages();
-		for (String message : messages) {
-			Utils.print(message);
-		}
-		 */
-	}
-
+	// TODO: chat
 }

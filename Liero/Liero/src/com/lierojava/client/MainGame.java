@@ -1,10 +1,9 @@
 package com.lierojava.client;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map.Entry;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -29,6 +28,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import com.esotericsoftware.kryonet.rmi.TimeoutException;
 import com.lierojava.Constants;
 import com.lierojava.PlayerData;
 import com.lierojava.Utils;
@@ -39,7 +39,7 @@ import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.BaseScreen;
 import com.lierojava.gui.HUD;
 import com.lierojava.gui.LobbyScreen;
-import com.lierojava.net.handles.ParticipantHost;
+import com.lierojava.net.handles.ParticipantHostPlayer;
 import com.lierojava.net.handshake.HostHandshake;
 import com.lierojava.net.interfaces.IHostHandshake;
 import com.lierojava.net.interfaces.IHostServer;
@@ -47,6 +47,7 @@ import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
 import com.lierojava.render.RenderProxy;
 import com.lierojava.server.data.HostStruct;
+import com.lierojava.server.data.ParticipantIdentifier;
 import com.lierojava.userdata.PendingAction;
 import com.lierojava.userdata.SimpleUserData;
 import com.lierojava.weapons.Weapon;
@@ -81,7 +82,7 @@ public class MainGame extends BaseScreen {
 	/**
 	 * The scores.
 	 */
-	public HashMap<Integer, PlayerData> scores = new HashMap<Integer, PlayerData>();
+	public ArrayList<PlayerData> scores = new ArrayList<PlayerData>();
 	
 	/**
 	 * The host. 
@@ -163,28 +164,67 @@ public class MainGame extends BaseScreen {
 	 * Start a new game as host.
 	 * @throws IOException
 	 */
-	private void startServer() throws IOException {
+	private void startServer() {
+		// Get a free port.
+		try {
+			ServerSocket s = new ServerSocket();
+			s.bind(null);
+			port = s.getLocalPort();
+			s.close();
+		} catch (IOException e1) {
+			BaseScreen screen = new LobbyScreen(game);
+			screen.showDialog("Could not find port", "Could not find a free port to use for hosting. Aborting.");
+			game.setScreen(screen);
+			return;
+		}
+		
 		Server server = new Server(12800 * 1024, 1600 * 1024);
 		Utils.setupKryo(server.getKryo());
 		server.start();
-		// TODO: Dynamic port detection.
-		server.bind(Constants.PORT, Constants.PORT);
+		try {
+			server.bind(port, port);
+		} 
+		catch (IOException e) {
+			BaseScreen screen = new LobbyScreen(game);
+			screen.showDialog("Port in use", "The port Liero uses for hosting servers is already in use. Are you already running a server? Aborting.");
+			game.setScreen(screen);
+			return;
+		}
 		
 		server.addListener(new Listener() {
 			@Override
 			public void connected(final Connection connection) {
-            	Utils.print("Connection");
             	GlobalState.objectSpace.addConnection(connection);
 			}
 
             @Override
 			public void disconnected(Connection connection) {
-            	Utils.print("Client lost");
+            	Utils.print(connection);
+            	Player leftPlayer = null;
+            	for (Player p : players) {
+            		Utils.print(p.connection);
+            		if (p.connection == connection) {
+            			leftPlayer = p;
+            			break;
+            		}
+            	}
+            	if (leftPlayer != null) {
+            		players.remove(leftPlayer);
+            		leftPlayer.getBody().setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
+            	}
             }
 
             @Override
 			public void received(Connection connection, Object object) {
             	GlobalState.lastSender = connection;
+            	if (object instanceof ParticipantIdentifier) {
+            		ParticipantIdentifier pi = (ParticipantIdentifier)object;
+            		for (Player p : players) {
+            			if (p.data.id == pi.dbId) {
+            				p.connection = connection;
+            			}
+            		}
+            	}
             }
         });
 		
@@ -193,8 +233,8 @@ public class MainGame extends BaseScreen {
 		GlobalState.objectSpace.register(0, ihh);
 		
 		// Get an IParticipantHost object for the local player.
-		ihh.requestParticipant(true, GlobalState.ips.getDatabaseId(), weapons);
-		iph = new ParticipantHost(players.get(0));
+		ihh.requestParticipant(true, GlobalState.ips.getDatabaseId(), GlobalState.ips.getName(), weapons);
+		iph = new ParticipantHostPlayer(players.get(0));
 		
 		// Connect to the global server.
 		Client kryoClient = connectServer();
@@ -203,7 +243,7 @@ public class MainGame extends BaseScreen {
 		}
 		
 		// Register the host.
-		HostStruct hs = new HostStruct(Constants.PORT, GlobalState.ips.getName());
+		HostStruct hs = new HostStruct(port, GlobalState.ips.getName());
 		int ihsId = GlobalState.ips.addGame(hs);
 		
 		if (ihsId == -1) {
@@ -228,18 +268,27 @@ public class MainGame extends BaseScreen {
 			client.connect(5000, host, port, port);
 		} catch (IOException e) {
 			BaseScreen screen = new LobbyScreen(game);
-			screen.showDialog("Port in use", "The port Liero uses for hosting servers is already in use. Are you already running a server? Aborting.");
+			screen.showDialog("Conection failed", "Could not connect to host. Aborting.");
 			game.setScreen(screen);
 			return;
 		}
 		client.setTimeout(0);
 
 		IHostHandshake ihh = ObjectSpace.getRemoteObject(client, 0, IHostHandshake.class);
-		int index = ihh.requestParticipant(weapons != null, GlobalState.ips.getDatabaseId(), weapons);
+		int index = ihh.requestParticipant(weapons != null, GlobalState.ips.getDatabaseId(), GlobalState.ips.getName(), weapons);
 		if (index > 0) {
 			iph = ObjectSpace.getRemoteObject(client, index, IParticipantHost.class);
+			
+			// Workaround to be able to link a connection to an account
+			ParticipantIdentifier ident = new ParticipantIdentifier();
+			ident.dbId = GlobalState.ips.getDatabaseId();
+			client.sendTCP(ident);
+			
+			// Update time.
+			timeRemaining = iph.getTimeRemaining();
 		}
 	}
+	
 	/**
 	 * Gets executed once every frame.
 	 * 
@@ -247,27 +296,34 @@ public class MainGame extends BaseScreen {
 	 */	
 	@Override
 	public void render(float delta) {
+		// Update the time remaining.
+		timeRemaining -= delta;
+			
 		if (timeRemaining > 0) {
 			// Handle input.
-			handleInput();
-					
+			try {
+				handleInput();
+			}
+			catch (TimeoutException e) {}
+			
 			// Perform a game step.
 			if (host == null) {
 				update();
 			} 
 			else {
-				// TODO: Nullpointer for spectators.
-				ArrayList<RenderProxy> newRenderProxies = iph.getRenderProxies();
-				if (newRenderProxies != null) {
-					renderProxies = newRenderProxies;
-				}
+				updateData();
 			}
-			
+								
 			// Render. 
 			render();
 		} 
 		else {
-			update();
+			if (host == null) {
+				update();
+				for (PlayerData pd : scores) {
+					ihs.savePlayerStats(pd.id, pd.kills, pd.deaths);
+				}
+			}
 			super.render(delta);
 		}
 	}
@@ -338,11 +394,6 @@ public class MainGame extends BaseScreen {
 		if (toggleDebugKey.isPressed()) {
 			debug = !debug;
 		}
-		
-		// TODO: Remove in final version
-		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
-			Gdx.app.exit();
-		}
 	}
 
 	/**
@@ -354,8 +405,8 @@ public class MainGame extends BaseScreen {
 		
 		synchronized(this) {
 		// Perform a physics step.
-		world.step(1f/30f, 8, 3);
-		while(world.isLocked());
+			world.step(1f/30f, 8, 3);
+			while(world.isLocked());
 		}
 		
 		// Perform pending actions.
@@ -374,6 +425,20 @@ public class MainGame extends BaseScreen {
 			renderProxies.addAll(hud.render());
 			Collections.sort(renderProxies);
 		}
+	}
+	
+	/**
+	 * Get updated data from the host.
+	 */
+	private void updateData() {
+		// Get the render data.
+		ArrayList<RenderProxy> newRenderProxies = iph.getRenderProxies();
+		if (newRenderProxies != null) {
+			renderProxies = newRenderProxies;
+		}
+		
+		// Get the scores.
+		scores = iph.getScores();
 	}
 
 	/**
@@ -441,11 +506,11 @@ public class MainGame extends BaseScreen {
 		
 		// Draw the scores.
 		int i = 0;
-		for (Entry<Integer, PlayerData> entry : scores.entrySet()) {
+		for (PlayerData pd : scores) {
 			batch.draw(i % 2 == 0 ? even : odd, width * -0.4f + 16, height * 0.4f - 60 - 20 * i, width * 0.8f - 32, 20);
-			dataFont.draw(batch, entry.getValue().name, width * -0.4f + 20, height * 0.4f - 44 - 20 * i);
-			dataFont.draw(batch, entry.getValue().kills + "", width * 0.2f, height * 0.4f - 44 - 20 * i);
-			dataFont.draw(batch, entry.getValue().deaths + "", width * 0.3f, height * 0.4f - 44 - 20 * i);
+			dataFont.draw(batch, pd.name, width * -0.4f + 20, height * 0.4f - 44 - 20 * i);
+			dataFont.draw(batch, pd.kills + "", width * 0.2f, height * 0.4f - 44 - 20 * i);
+			dataFont.draw(batch, pd.deaths + "", width * 0.3f, height * 0.4f - 44 - 20 * i);
 			
 			i++;
 		}
@@ -502,13 +567,7 @@ public class MainGame extends BaseScreen {
 			public void postSolve(Contact contact, ContactImpulse impulse) {}
 		});
 		
-		// Start the server.
-		try {
-			startServer();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		startServer();
 		
 		// Handle all input.
 		Gdx.input.setInputProcessor(stage);

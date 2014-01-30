@@ -133,8 +133,7 @@ public class LobbyScreen extends BaseScreen {
         
         btnHost.addListener(new ClickListener(){
             @Override 
-            public void clicked(InputEvent event, float x, float y){
-            	// TODO: Weapon select screen first.
+            public void clicked(InputEvent event, float x, float y) {
 				game.setScreen(new WeaponScreen(game, null, -1));
             }
         });

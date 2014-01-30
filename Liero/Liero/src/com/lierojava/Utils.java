@@ -32,14 +32,14 @@ import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.StaticBarrier;
 import com.lierojava.gui.HUD;
 import com.lierojava.net.handles.HostServer;
-import com.lierojava.net.handles.ParticipantChat;
-import com.lierojava.net.handles.ParticipantHost;
+import com.lierojava.net.handles.Chat;
+import com.lierojava.net.handles.ParticipantHostPlayer;
 import com.lierojava.net.handles.ParticipantServer;
 import com.lierojava.net.handshake.HostHandshake;
 import com.lierojava.net.handshake.ServerHandshake;
 import com.lierojava.net.interfaces.IHostHandshake;
 import com.lierojava.net.interfaces.IHostServer;
-import com.lierojava.net.interfaces.IParticipantChat;
+import com.lierojava.net.interfaces.IChat;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.net.interfaces.IServerHandshake;
@@ -61,14 +61,14 @@ public class Utils {
 		IHostServer.class,
 		IHostHandshake.class,
 		IServerHandshake.class,
-		IParticipantChat.class,
+		IChat.class,
 		
-		ParticipantHost.class,
+		ParticipantHostPlayer.class,
 		ParticipantServer.class,
 		HostServer.class,
 		HostHandshake.class,
 		ServerHandshake.class,
-		ParticipantChat.class,
+		Chat.class,
 
 		Participant.class,
 		Player.class,

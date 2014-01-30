@@ -27,6 +27,7 @@ public final class Constants {
 	 * The game duration, in seconds.
 	 */
 	public static final int GAME_DURATION = 600;
+
 	
 	/**
 	 * Conversion from screen units to Box2D units.

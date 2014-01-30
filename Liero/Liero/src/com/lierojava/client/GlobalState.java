@@ -3,7 +3,7 @@ package com.lierojava.client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import com.lierojava.enums.GameState;
-import com.lierojava.net.interfaces.IParticipantChat;
+import com.lierojava.net.interfaces.IChat;
 import com.lierojava.net.interfaces.IParticipantServer;
 
 public class GlobalState {
@@ -40,5 +40,5 @@ public class GlobalState {
 	/**
 	 * The chat handle to the global server.
 	 */
-	public static IParticipantChat ipc;
+	public static IChat ipc;
 }

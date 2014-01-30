@@ -3,10 +3,10 @@ package com.lierojava.net.handles;
 import java.util.ArrayList;
 
 import com.lierojava.client.GlobalState;
-import com.lierojava.net.interfaces.IParticipantChat;
+import com.lierojava.net.interfaces.IChat;
 import com.lierojava.server.GlobalServerState;
 
-public class ParticipantChat implements IParticipantChat {
+public class Chat implements IChat {
 
 	/**
 	 * The ArrayList of messages, set to GlobalServerState if this is global chat, set to GlobalState if not
@@ -22,7 +22,7 @@ public class ParticipantChat implements IParticipantChat {
 	 * Default constructor
 	 * @param isGlobalChat Whether this instance handles globalchat
 	 */
-	public ParticipantChat(boolean isGlobalChat) {
+	public Chat(boolean isGlobalChat) {
 		if (isGlobalChat) {
 			messages = GlobalServerState.chatMessages;
 		} else {
@@ -36,7 +36,6 @@ public class ParticipantChat implements IParticipantChat {
 	@Override
 	public void sendMessage(String message) {
 		messages.add(message);
-		
 	}
 
 	/**
@@ -44,11 +43,11 @@ public class ParticipantChat implements IParticipantChat {
 	 */
 	@Override
 	public ArrayList<String> getNewMessages() {
-		//There are no new messages, return an empty arraylist
+		// There are no new messages, return an empty arraylist.
 		if (messages.size() <= messageIndex) {
 			return new ArrayList<String>();
 		}
-		//Return the new messages and set the index to the last message returned
+		// Return the new messages and set the index to the last message returned.
 		ArrayList<String> newMessages = new ArrayList<String>(messages.subList(messageIndex, messages.size())); 
 		messageIndex = messages.size();
 		return newMessages;
