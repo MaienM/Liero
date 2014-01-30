@@ -2,7 +2,7 @@ package com.lierojava.net.interfaces;
 
 import java.util.ArrayList;
 
-import com.lierojava.weapons.Weapon;
+import com.lierojava.combat.weapons.Weapon;
 
 
 /**

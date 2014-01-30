@@ -2,15 +2,9 @@ package com.lierojava.client;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
-import com.lierojava.enums.GameState;
 import com.lierojava.net.interfaces.IParticipantServer;
 
 public class GlobalState {
-	/**
-	 * The current gamestate.
-	 */
-	public static GameState gameState;
-	
 	/**
 	 * The currently running game.
 	 */

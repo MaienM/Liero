@@ -23,33 +23,32 @@ import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.LongMap.Values;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
-import com.lierojava.bullets.Bullet;
-import com.lierojava.bullets.PistolBullet;
 import com.lierojava.client.GlobalState;
 import com.lierojava.client.MainGame;
-import com.lierojava.enums.GameState;
+import com.lierojava.client.gui.HUD;
+import com.lierojava.combat.bullets.Bullet;
+import com.lierojava.combat.bullets.PistolBullet;
+import com.lierojava.combat.weapons.Jetpack;
+import com.lierojava.combat.weapons.Pistol;
+import com.lierojava.combat.weapons.Weapon;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.StaticBarrier;
-import com.lierojava.gui.HUD;
-import com.lierojava.net.handles.HostServer;
-import com.lierojava.net.handles.Chat;
-import com.lierojava.net.handles.ParticipantHostPlayer;
-import com.lierojava.net.handles.ParticipantServer;
-import com.lierojava.net.handshake.HostHandshake;
-import com.lierojava.net.handshake.ServerHandshake;
+import com.lierojava.gameobjects.userdata.SimpleUserData;
+import com.lierojava.net.implementations.Chat;
+import com.lierojava.net.implementations.HostHandshake;
+import com.lierojava.net.implementations.HostServer;
+import com.lierojava.net.implementations.ParticipantHostPlayer;
+import com.lierojava.net.implementations.ParticipantServer;
+import com.lierojava.net.implementations.ServerHandshake;
+import com.lierojava.net.interfaces.IChat;
 import com.lierojava.net.interfaces.IHostHandshake;
 import com.lierojava.net.interfaces.IHostServer;
-import com.lierojava.net.interfaces.IChat;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.net.interfaces.IParticipantServer;
 import com.lierojava.net.interfaces.IServerHandshake;
 import com.lierojava.participants.Participant;
 import com.lierojava.participants.Player;
 import com.lierojava.participants.Spectator;
-import com.lierojava.userdata.SimpleUserData;
-import com.lierojava.weapons.Jetpack;
-import com.lierojava.weapons.Pistol;
-import com.lierojava.weapons.Weapon;
 
 public class Utils {
 	/**
@@ -76,7 +75,6 @@ public class Utils {
 		Spectator.class,
 		Chatroom.class,
 		PlayerData.class,
-		GameState.class,
 		StaticBarrier.class,
 		SimpleUserData.class,
 		Weapon.class,

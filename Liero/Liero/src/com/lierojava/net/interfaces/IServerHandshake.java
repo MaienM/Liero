@@ -1,6 +1,6 @@
 package com.lierojava.net.interfaces;
 
-import com.lierojava.enums.AccountState;
+import com.lierojava.server.data.AccountState;
 
 /**
  * The interface for handshakes with the server.

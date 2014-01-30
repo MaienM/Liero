@@ -42,25 +42,25 @@ import com.esotericsoftware.kryonet.rmi.TimeoutException;
 import com.lierojava.Constants;
 import com.lierojava.PlayerData;
 import com.lierojava.Utils;
-import com.lierojava.bullets.Bullet;
+import com.lierojava.client.gui.BaseScreen;
+import com.lierojava.client.gui.HUD;
+import com.lierojava.client.gui.LobbyScreen;
+import com.lierojava.client.render.RenderProxy;
+import com.lierojava.combat.bullets.Bullet;
+import com.lierojava.combat.weapons.Weapon;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
-import com.lierojava.gui.BaseScreen;
-import com.lierojava.gui.HUD;
-import com.lierojava.gui.LobbyScreen;
-import com.lierojava.net.handles.ParticipantHostPlayer;
-import com.lierojava.net.handshake.HostHandshake;
+import com.lierojava.gameobjects.userdata.PendingAction;
+import com.lierojava.gameobjects.userdata.SimpleUserData;
+import com.lierojava.net.implementations.HostHandshake;
+import com.lierojava.net.implementations.ParticipantHostPlayer;
 import com.lierojava.net.interfaces.IHostHandshake;
 import com.lierojava.net.interfaces.IHostServer;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;
-import com.lierojava.render.RenderProxy;
 import com.lierojava.server.data.HostStruct;
 import com.lierojava.server.data.ParticipantIdentifier;
-import com.lierojava.userdata.PendingAction;
-import com.lierojava.userdata.SimpleUserData;
-import com.lierojava.weapons.Weapon;
 
 public class MainGame extends BaseScreen {
 	/**

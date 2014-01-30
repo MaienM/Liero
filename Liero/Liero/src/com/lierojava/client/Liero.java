@@ -2,7 +2,7 @@ package com.lierojava.client;
 
 import com.badlogic.gdx.Game;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
-import com.lierojava.gui.LoginScreen;
+import com.lierojava.client.gui.LoginScreen;
 
 
 public class Liero extends Game {	

@@ -3,8 +3,8 @@ package com.lierojava.net.interfaces;
 import java.util.ArrayList;
 
 import com.lierojava.PlayerData;
+import com.lierojava.client.render.RenderProxy;
 import com.lierojava.participants.Player;
-import com.lierojava.render.RenderProxy;
 
 /**
  * The interface for communication from the participant to the host.

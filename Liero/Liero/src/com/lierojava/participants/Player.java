@@ -17,17 +17,17 @@ import com.esotericsoftware.kryonet.Connection;
 import com.lierojava.Constants;
 import com.lierojava.PlayerData;
 import com.lierojava.Utils;
-import com.lierojava.bullets.Bullet;
 import com.lierojava.client.GlobalState;
+import com.lierojava.client.render.RenderProxy;
+import com.lierojava.client.render.TextureRenderProxy;
+import com.lierojava.combat.bullets.Bullet;
+import com.lierojava.combat.weapons.Jetpack;
+import com.lierojava.combat.weapons.Weapon;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
 import com.lierojava.gameobjects.StaticBarrier;
-import com.lierojava.render.RenderProxy;
-import com.lierojava.render.TextureRenderProxy;
-import com.lierojava.userdata.PendingAction;
-import com.lierojava.userdata.SimpleUserData;
-import com.lierojava.weapons.Jetpack;
-import com.lierojava.weapons.Weapon;
+import com.lierojava.gameobjects.userdata.PendingAction;
+import com.lierojava.gameobjects.userdata.SimpleUserData;
 
 public class Player extends GameObject {
 	/**

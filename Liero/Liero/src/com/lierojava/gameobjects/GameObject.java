@@ -2,8 +2,8 @@ package com.lierojava.gameobjects;
 
 import java.util.ArrayList;
 
-import com.lierojava.bullets.Bullet;
-import com.lierojava.render.RenderProxy;
+import com.lierojava.client.render.RenderProxy;
+import com.lierojava.combat.bullets.Bullet;
 
 public abstract class GameObject {
 	/**
