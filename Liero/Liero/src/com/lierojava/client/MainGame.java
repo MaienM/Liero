@@ -46,7 +46,6 @@ import com.lierojava.client.gui.BaseScreen;
 import com.lierojava.client.gui.HUD;
 import com.lierojava.client.gui.LobbyScreen;
 import com.lierojava.client.render.RenderProxy;
-import com.lierojava.combat.bullets.Bullet;
 import com.lierojava.combat.weapons.Weapon;
 import com.lierojava.gameobjects.GameObject;
 import com.lierojava.gameobjects.Ground;
@@ -736,15 +735,9 @@ public class MainGame extends BaseScreen {
 			return;
 		}
 		
-		// Let the bullets do damage.
-		if (bodyA.isBullet()) {
-			objB.damage((Bullet)objA);
-			bodyA.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
-		}
-		if (bodyB.isBullet()) {
-			objA.damage((Bullet)objB);
-			bodyB.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
-		}
+		// Perform the collisions.
+		objA.collision(objB, bodyA, bodyB);
+		objB.collision(objA, bodyB, bodyA);
 	}	
 	
 	/**

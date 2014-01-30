@@ -404,4 +404,8 @@ public class Player extends GameObject {
 			super.damage(bullet);
 		}
 	}
+
+	@Override
+	public void collision(GameObject other, Body ownBody, Body otherBody) {
+	}
 }

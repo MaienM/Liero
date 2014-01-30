@@ -12,7 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.lierojava.Constants;
 import com.lierojava.client.MainGame;
 import com.lierojava.combat.weapons.Grenade;
+import com.lierojava.combat.weapons.Laser;
 import com.lierojava.combat.weapons.Pistol;
+import com.lierojava.combat.weapons.Rocket;
 import com.lierojava.combat.weapons.Shotgun;
 import com.lierojava.combat.weapons.Weapon;
 
@@ -43,7 +45,7 @@ public class WeaponScreen extends BaseScreen {
 		show(1200);
 		
 		// Title.
-		table.add(new Label("Pick 3", Constants.SKIN, "label-title")).colspan(7).fillY().expandY();
+		table.add(new Label("Pick 3", Constants.SKIN, "label-title")).colspan(9).fillY().expandY();
 		table.row();
 		
 		// HSpacer.
@@ -87,10 +89,36 @@ public class WeaponScreen extends BaseScreen {
 		
 		// HSpacer.
 		table.add().fillX().expandX();
+		
+		// Laser
+		final Image btnLaser = new Image(Constants.TEXTURES.findRegion("icon_lasergun"));
+		btnLaser.addListener(new ClickListener() {
+			@Override 
+            public void clicked(InputEvent event, float x, float y){
+				handleClick(event, Laser.class);
+            }
+		});
+		table.add(btnLaser).fill().expand();
+		
+		// HSpacer.
+		table.add().fillX().expandX();
+		
+		// Laser
+		final Image btnRocket = new Image(Constants.TEXTURES.findRegion("icon_rocket"));
+		btnRocket.addListener(new ClickListener() {
+			@Override 
+            public void clicked(InputEvent event, float x, float y){
+				handleClick(event, Rocket.class);
+            }
+		});
+		table.add(btnRocket).fill().expand();
+		
+		// HSpacer.
+		table.add().fillX().expandX();
 		table.row();		
 		
 		// VSpacer.
-    	table.add().colspan(2).fillY().expandY();
+    	table.add().colspan(4).fillY().expandY();
 		
 		// Start button.
     	final TextButton btnStart = new TextButton("Start", Constants.SKIN);

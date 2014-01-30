@@ -113,4 +113,6 @@ public class StaticBarrier extends GameObject {
 	public void damage(Bullet bullet) {}
 	@Override
 	protected void die(Bullet bullet) {}
+	@Override
+	public void collision(GameObject other, Body ownBody, Body otherBody) {}
 }

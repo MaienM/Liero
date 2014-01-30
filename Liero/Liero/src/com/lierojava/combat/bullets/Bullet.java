@@ -13,6 +13,7 @@ import com.lierojava.client.GlobalState;
 import com.lierojava.client.render.RenderProxy;
 import com.lierojava.client.render.TextureRenderProxy;
 import com.lierojava.gameobjects.GameObject;
+import com.lierojava.gameobjects.userdata.SimpleUserData;
 import com.lierojava.participants.Player;
 
 public abstract class Bullet extends GameObject {
@@ -35,6 +36,11 @@ public abstract class Bullet extends GameObject {
 	 * The speed of the bullet.
 	 */
 	protected float speed;
+	
+	/**
+	 * The gravity of the bullet.
+	 */
+	protected float gravity = 1;
 	
 	/**
 	 * The texture region of the bullet.
@@ -62,6 +68,7 @@ public abstract class Bullet extends GameObject {
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(start);
 		bodyDef.bullet = true;
+		bodyDef.gravityScale = gravity;
 		Body body = GlobalState.currentGame.world.createBody(bodyDef);
 		body.setUserData(this);
 		bodies.add(body);
@@ -73,7 +80,7 @@ public abstract class Bullet extends GameObject {
 		// Create the fixture.
 		FixtureDef fixture = new FixtureDef();
 		fixture.shape = box;
-		fixture.density = 1.0f;
+		fixture.density = 1;
 		fixture.friction = 3.0f;
 		fixture.restitution = 0.2f;
 		body.createFixture(fixture);
@@ -93,5 +100,11 @@ public abstract class Bullet extends GameObject {
 	
 	@Override
 	protected void die(Bullet bullet) {
+	}
+	
+	@Override
+	public void collision(GameObject other, Body ownBody, Body otherBody) {
+		other.damage(this);
+		ownBody.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 	}
 }

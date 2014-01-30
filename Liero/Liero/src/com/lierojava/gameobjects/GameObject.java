@@ -2,6 +2,7 @@ package com.lierojava.gameobjects;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.physics.box2d.Body;
 import com.lierojava.client.render.RenderProxy;
 import com.lierojava.combat.bullets.Bullet;
 
@@ -34,4 +35,12 @@ public abstract class GameObject {
 	 * @param bullet The bullet by which you were killed.
 	 */
 	protected abstract void die(Bullet bullet);
+	
+	/**
+	 * Handles a collision.
+	 * @param other The other gameobject.
+	 * @param ownBody Own body.
+	 * @param otherBody The other body.
+	 */
+	public abstract void collision(GameObject other, Body ownBody, Body otherBody);
 }

@@ -5,13 +5,13 @@ import com.lierojava.participants.Player;
 
 public class Laser extends Weapon {
 	public Laser() {
-		maxCharge = 1000;
-		regenSpeed = 10f;
-		knockbackForce = 1f;
-		fireRate = 0.03f;
+		maxCharge = 25;
+		regenSpeed = 0.3f;
+		knockbackForce = 0f;
+		fireRate = 0.07f;
 		//fireSound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser.mp3"));
 		bulletClass = LaserBullet.class;
-		icon = "icon_laser";
+		icon = "icon_lasergun";
 	}
 	public Laser(Player p) {
 		this();

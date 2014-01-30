@@ -59,4 +59,8 @@ public class Ground extends GameObject {
 	protected void die(Bullet bullet) {
 		body.setUserData(SimpleUserData.MARKED_FOR_REMOVAL);
 	}
+
+	@Override
+	public void collision(GameObject other, Body ownBody, Body otherBody) {
+	}
 }
