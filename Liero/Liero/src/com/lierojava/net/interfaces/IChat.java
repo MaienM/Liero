@@ -19,4 +19,9 @@ public interface IChat {
 	 * @param message The message to add
 	 */
 	void sendMessage(String message);
+	
+	/**
+	 * Reset the last request counter, so we will get all messages again.
+	 */
+	void reset();
 }

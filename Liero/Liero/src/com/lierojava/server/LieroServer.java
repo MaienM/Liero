@@ -250,5 +250,10 @@ public class LieroServer {
 		return false;
 	}
 	
-	// TODO: chat
+	/**
+	 * End the current game.
+	 */
+	public void endGame() {
+		
+	}
 }

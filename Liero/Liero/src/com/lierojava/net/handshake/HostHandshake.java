@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.lierojava.client.GlobalState;
 import com.lierojava.net.handles.ParticipantHostPlayer;
+import com.lierojava.net.handles.ParticipantHostSpectator;
 import com.lierojava.net.interfaces.IHostHandshake;
 import com.lierojava.net.interfaces.IParticipantHost;
 import com.lierojava.participants.Player;

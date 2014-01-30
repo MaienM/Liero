@@ -53,4 +53,8 @@ public class Chat implements IChat {
 		return newMessages;
 	}
 
+	@Override
+	public void reset() {
+		messageIndex = 0;
+	}
 }

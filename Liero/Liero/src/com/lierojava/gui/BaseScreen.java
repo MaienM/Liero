@@ -7,7 +7,6 @@ import org.apache.commons.lang3.text.WordUtils;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -48,6 +47,11 @@ public abstract class BaseScreen implements Screen {
      */
     protected Vector2 screen;
     
+    /**
+     * The background image.
+     */
+    protected Image bg;
+    
     public BaseScreen(Game game) {
     	this.game = game;
     }
@@ -58,7 +62,7 @@ public abstract class BaseScreen implements Screen {
     	stage = new Stage();
     	   	
         // Setup the background.
-        Image bg = new Image(Constants.TEXTURE_BACKGROUND);
+        bg = new Image(Constants.TEXTURE_BACKGROUND);
         bg.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage.addActor(bg);
         
@@ -77,10 +81,7 @@ public abstract class BaseScreen implements Screen {
     }
 
     @Override
-    public void render(float delta) {        
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        
+    public void render(float delta) {                
         stage.act(delta);
         batch.begin();
         stage.draw();
@@ -127,6 +128,8 @@ public abstract class BaseScreen implements Screen {
 				this.setVisible(false);
 			}
 		};
+		d.setModal(true);
+		d.setMovable(false);
 		
 		// Create the label.
 		text = WordUtils.wrap(text, 30);

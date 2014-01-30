@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -22,6 +24,14 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -99,11 +109,6 @@ public class MainGame extends BaseScreen {
 	 * The desired weapons.
 	 */
 	private ArrayList<Class<? extends Weapon>> weapons;
-
-	/**
-	 * Renders sprites.
-	 */
-	private SpriteBatch batch;
 	
 	/**
 	 * The render proxies.
@@ -138,9 +143,15 @@ public class MainGame extends BaseScreen {
 	private KeyHandler toggleDebugKey = new KeyHandler(1f, Keys.F12);
 
 	/**
+	 * The chat UI elements.
+	 */
+	private Table tblChat;
+	private TextField tbChat;
+
+	/**
 	 * The chat.
 	 */
-	public ArrayList<String> chatMessages;
+	public ArrayList<String> chatMessages = new java.util.ArrayList<String>();
 
 	/**
 	 * Create a new game.
@@ -317,14 +328,22 @@ public class MainGame extends BaseScreen {
 			// Render. 
 			render();
 		} 
-		else {
+		else if (timeRemaining > -10) {
+			timeRemaining = -20;
 			if (host == null) {
 				update();
 				for (PlayerData pd : scores) {
 					ihs.savePlayerStats(pd.id, pd.kills, pd.deaths);
 				}
 			}
+			GlobalState.ips.endGame();
+			setupEndUI();
+		}
+		else {
 			super.render(delta);
+			batch.begin();
+			renderScore(batch);
+			batch.end();
 		}
 	}
 
@@ -335,7 +354,7 @@ public class MainGame extends BaseScreen {
 		// Score display.
 		showScore = Gdx.input.isKeyPressed(Keys.TAB);
 		
-		if (iph == null) {
+		if (iph == null || stage.getKeyboardFocus() != null) {
 			return;
 		}
 		
@@ -393,6 +412,11 @@ public class MainGame extends BaseScreen {
 		// Toggle the debug renderer.
 		if (toggleDebugKey.isPressed()) {
 			debug = !debug;
+		}
+		
+		// Chat.
+		if (Gdx.input.isKeyPressed(Keys.T)) {
+			stage.setKeyboardFocus(tbChat);
 		}
 	}
 
@@ -478,6 +502,8 @@ public class MainGame extends BaseScreen {
 		if (debug) {
 			debugRenderer.render(world, camera.combined);
 		}
+		
+		super.render(0.1f);
 	}			
 	
 	/**
@@ -573,8 +599,94 @@ public class MainGame extends BaseScreen {
 		Gdx.input.setInputProcessor(stage);
 	}
 	
-	private void setupUI() {
+	private void setupUI() {   			
+		// Hide background.
+		bg.setVisible(false);
 		
+		tblChat = new Table(Constants.SKIN);
+		tblChat.setSize(screen.x / 4, screen.y / 4);
+		stage.addActor(tblChat);
+		
+		tblChat.setPosition(Constants.BARRIER_SIZE, Constants.BARRIER_SIZE);
+		
+		// Chat box.
+    	final Label lblChat = new Label("Connected to in-game chat\n", Constants.SKIN);
+    	lblChat.setWrap(true);
+    	
+    	final ScrollPane scrollChat = new ScrollPane(lblChat);
+    	scrollChat.setScrollingDisabled(true, false);
+    	
+    	tblChat.add(scrollChat).colspan(2).fill().expand();
+    	tblChat.row();
+    	
+    	// Update thread.
+    	new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {}
+				while (timeRemaining > 0) {
+					// Refresh chat.
+					ArrayList<String> newMessages = iph.getNewMessages();
+					if (!newMessages.isEmpty()) {
+						lblChat.setText(lblChat.getText() + StringUtils.join(newMessages, '\n') + "\n ");
+						scrollChat.setScrollPercentY(1f);
+					}
+					
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {}
+				}
+			}
+		}).start();
+    	
+    	// Send box.
+    	tbChat = new TextField("", Constants.SKIN);
+    	tbChat.setMessageText("Enter a chat message here");
+    	tblChat.add(tbChat).fillX().expandX();
+    	
+    	tbChat.addListener(new InputListener() {
+    		@Override
+    		public boolean keyUp(InputEvent event, int keycode) {
+				if (keycode == Keys.ENTER) {
+					String message = tbChat.getText();
+	            	if (message.isEmpty()) {
+	            		return false;
+	            	}
+	            	tbChat.setText("");
+	            	iph.sendMessage(message);
+	            	stage.setKeyboardFocus(null);
+				}
+				return false;
+			}
+    	});
+	}
+	
+	private void setupEndUI() {
+		// Hide the chat, show the background.
+		bg.setVisible(true);
+		tblChat.setVisible(false);
+		
+		// Title.
+		final Label lblTitle = new Label("Round ended", Constants.SKIN, "label-title");
+		table.add(lblTitle);
+		table.row();
+		
+		// Space for the scores.
+		table.add().height(screen.y * 0.85f);
+		table.row();
+
+		// Button.
+		final TextButton btnLobby = new TextButton("Return to lobby", Constants.SKIN);
+		table.add(btnLobby).height(screen.y * 0.05f);
+		
+		btnLobby.addListener(new ClickListener(){
+			@Override 
+	        public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new LobbyScreen(game));
+			}
+		});
 	}
 	
 	public void endContact(Contact contact) {

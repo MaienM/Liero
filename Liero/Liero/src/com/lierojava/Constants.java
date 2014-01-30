@@ -26,8 +26,7 @@ public final class Constants {
 	/**
 	 * The game duration, in seconds.
 	 */
-	public static final int GAME_DURATION = 600;
-
+	public static final int GAME_DURATION = 15;
 	
 	/**
 	 * Conversion from screen units to Box2D units.
@@ -47,7 +46,7 @@ public final class Constants {
 	/**
 	 * The players jump speed.
 	 */
-	public static final float PLAYER_JUMP_SPEED = 35f;
+	public static final float PLAYER_JUMP_SPEED = 40f;
 	
 	/**
 	 * The players aim speed.

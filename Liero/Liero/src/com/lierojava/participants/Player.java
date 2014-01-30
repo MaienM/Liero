@@ -236,10 +236,16 @@ public class Player extends GameObject {
 		for (Body b : Utils.getContactBodies(body)) {
 			// For each of our contact objects, check if it is a ground or staticbarrier object, and if it is below us.
 			Object ud = b.getUserData();
-			if (ud instanceof Ground || ud instanceof StaticBarrier) {
+			if (ud instanceof Ground) {
 				Vector2 diff = new Vector2(b.getPosition());
 				diff.sub(body.getPosition());
-				if (diff.y < 0 && Math.abs(diff.y) > Math.abs(diff.x)) {
+				if (diff.y < 0.1f && Math.abs(diff.y) > Math.abs(diff.x)) {
+					isTouchingGround = true;
+					break;
+				}
+			}
+			else if (ud instanceof StaticBarrier) {
+				if (b.getPosition().y < -Gdx.graphics.getHeight() / 2) {
 					isTouchingGround = true;
 					break;
 				}

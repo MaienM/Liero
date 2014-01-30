@@ -2,14 +2,16 @@ package com.lierojava.gui;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -31,6 +33,7 @@ public class LobbyScreen extends BaseScreen {
 	@Override
     public void show() {   
     	super.show(600);
+    	GlobalState.ips.reset();
     	
     	// Left panel: stats + chat.
     	final Table tblLeft = new Table();
@@ -46,11 +49,36 @@ public class LobbyScreen extends BaseScreen {
     	tblLeft.row();
     	
     	// Chat box.
-    	final TextArea taChat = new TextArea("", Constants.SKIN);
-    	taChat.setDisabled(true);
-    	tblLeft.add(taChat).colspan(2).fill().expand();
+    	final Label lblChat = new Label("Connected to global chat\n", Constants.SKIN);
+    	lblChat.setWrap(true);
+    	
+    	final ScrollPane scrollChat = new ScrollPane(lblChat);
+    	scrollChat.setScrollingDisabled(true, false);
+    	
+    	tblLeft.add(scrollChat).colspan(2).fill().expand();
     	tblLeft.row();
     	
+    	// Update thread.
+    	final Screen s = this;
+    	new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (game.getScreen() == s) {
+					// Refresh chat.
+					ArrayList<String> newMessages = GlobalState.ips.getNewMessages();
+					if (!newMessages.isEmpty()) {
+						lblChat.setText(lblChat.getText() + StringUtils.join(newMessages, '\n') + "\n ");
+						scrollChat.setScrollPercentY(1f);
+					}
+					
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {}
+				}
+			}
+		}).start();
+    	
+    	// Send box.
     	final TextField tbChat = new TextField("", Constants.SKIN);
     	tbChat.setMessageText("Enter a chat message here");
     	tblLeft.add(tbChat).fillX().expandX();
@@ -67,7 +95,7 @@ public class LobbyScreen extends BaseScreen {
             		return;
             	}
             	tbChat.setText("");
-            	taChat.setText(taChat.getText() + "\n" + message);
+            	GlobalState.ips.sendMessage(message);
             }
         });
     	
@@ -77,7 +105,7 @@ public class LobbyScreen extends BaseScreen {
     	
     	// Game listing header.
     	final Label lblName = new Label("Select a game to join", Constants.SKIN);
-    	tblRight.add(lblName);
+    	tblRight.add(lblName).colspan(2);
     	tblRight.row();
     	
     	// Game listing.    	
@@ -87,13 +115,12 @@ public class LobbyScreen extends BaseScreen {
     	final ScrollPane scrollGames = new ScrollPane(listGames);
     	scrollGames.setScrollingDisabled(true, false);
     	
-    	tblRight.add(scrollGames).fill().expand();
+    	tblRight.add(scrollGames).colspan(2).fill().expand();
     	tblRight.row();
     	
     	// Join button.
     	final TextButton btnJoin = new TextButton("Join", Constants.SKIN);
         tblRight.add(btnJoin).fill();
-        tblRight.row();
         
         btnJoin.addListener(new ClickListener(){
             @Override 
@@ -129,7 +156,6 @@ public class LobbyScreen extends BaseScreen {
         // Host button.
     	final TextButton btnHost = new TextButton("Host", Constants.SKIN);
         tblRight.add(btnHost).fill();
-        tblRight.row();
         
         btnHost.addListener(new ClickListener(){
             @Override 

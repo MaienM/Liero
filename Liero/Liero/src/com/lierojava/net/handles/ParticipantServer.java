@@ -16,7 +16,7 @@ import com.lierojava.server.database.Account;
  * @author Michon
  */
 public class ParticipantServer extends Chat implements IParticipantServer {
-	/*
+	/**
 	 * The database id of the player
 	 */
 	public int databaseId;
@@ -32,36 +32,18 @@ public class ParticipantServer extends Chat implements IParticipantServer {
 	public ParticipantServer() {
 		super(true);
 	}
-	
-	/**
-	 * Main constructor
-	 * 
-	 * @param conn The connection id of this instance
-	 * 
-	 * @param db The database Id of the player belonging to this instance
-	 */
+
 	public ParticipantServer(int dbid, String name) {
 		this();
 		this.databaseId = dbid;
 		this.name = name;
 	}
 	
-	/**
-	 * Refreshes the game list
-	 * 
-	 * @return The complete list of current games
-	 */
 	@Override
 	public ArrayList<HostStruct> getGames() {
 		return new ArrayList<HostStruct>(GlobalServerState.accountGame.values());
 	}
 	
-	/**
-	 * Adds a game to the server, if this client is not already running a game
-	 * 
-	 * @param game The game to add
-	 * @return the id of the IHostServer object for this game
-	 */
 	@Override
 	public int addGame(HostStruct game) {
 		if (GlobalServerState.accountGame.containsKey(this.databaseId)) {
@@ -79,11 +61,14 @@ public class ParticipantServer extends Chat implements IParticipantServer {
 		GlobalServerState.serverObjectSpace.register(ihpId, ihs);
 		return ihpId;
 	}
+
+	@Override
+	public void endGame() {
+		if (GlobalServerState.accountGame.containsKey(this.databaseId)) {
+			GlobalServerState.accountGame.remove(this.databaseId);
+		}
+	}
 	
-	/**
-	 * Returns the database id of this participant
-	 * @return int the id of the participant
-	 */
 	@Override
 	public int getDatabaseId() {
 		return this.databaseId;

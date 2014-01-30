@@ -19,6 +19,11 @@ public interface IParticipantServer extends IChat {
 	public int addGame(HostStruct game);
 	
 	/**
+	 * End the current game.
+	 */
+	public void endGame();
+	
+	/**
 	 * Refreshes the current game list
 	 * 
 	 * @return Array containing all current games
