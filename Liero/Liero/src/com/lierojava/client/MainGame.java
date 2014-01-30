@@ -424,7 +424,7 @@ public class MainGame extends BaseScreen {
 	 */
 	private void update() {
 		// Update the time remaining.
-		timeRemaining -= Gdx.graphics.getDeltaTime();
+		timeRemaining -= (Gdx.graphics.getDeltaTime() / 2);
 		
 		synchronized(this) {
 		// Perform a physics step.
